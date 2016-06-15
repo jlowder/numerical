@@ -1,6 +1,6 @@
 # numerical
 
-A library of mumerical methods for Common Lisp. Currently a work in progress.
+A library of numerical methods for Common Lisp. Currently a work in progress.
 
 ## Overview
 
