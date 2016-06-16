@@ -56,6 +56,10 @@
 (in-package :numerical.integration)
 
 (defun piecewise/2 (f)
+  "Create a lambda that integrates a region over `F`. The lambda takes
+the lower and upper limits of the region as parameters, and optionally
+the number of segments to divide the region into. The algorithm used
+is piecewise linear approximation, i.e. the trapezoid rule."
   (lambda (l u &optional (n 1))
     (let ((h (/ (- u l) n)))
       (* .5d0 h (loop repeat (1+ n)
@@ -66,9 +70,18 @@
                                  (t (* 2 fx))))))))
 
 (defmacro piecewise/2+ ((x) f)
+  "Create a lambda that integrates a region over `F`. The lambda takes
+the lower and upper limits of the region as parameters, and optionally
+the number of segments to divide the region into. The algorithm used
+is piecewise linear approximation, i.e. the trapezoid rule."
   `(piecewise/2 (lambda (,x) ,f)))
 
 (defun piecewise/3 (f)
+  "Create a lambda that integrates a region over `F`. The lambda takes
+the lower and upper limits of the region as parameters, and optionally
+the number of segments to divide the region into (which will be
+incremented to make even if necessary). The algorithm used is
+piecewise quadratic approximation, i.e. Simpson's 1/3 rule."
   (lambda (l u &optional (n 2))
     (let* ((n (if (oddp n) (1+ n) n)) ; force n to be even
            (h (/ (- u l) n)))
@@ -81,9 +94,19 @@
                                       (t (* 2 fx))))))))
 
 (defmacro piecewise/3+ ((x) f)
+  "Create a lambda that integrates a region over `F`. The lambda takes
+the lower and upper limits of the region as parameters, and optionally
+the number of segments to divide the region into (which will be
+incremented to make even if necessary). The algorithm used is
+piecewise quadratic approximation, i.e. Simpson's 1/3 rule."
   `(piecewise/3 (lambda (,x) ,f)))
 
 (defun piecewise/4 (f)
+  "Create a lambda that integrates a region over `F`. The lambda takes
+the lower and upper limits of the region as parameters, and optionally
+the number of segments to divide the region into (which will be
+incremented to make divisible by 3 if necessary). The algorithm used is
+piecewise cubic approximation, i.e. Simpson's 3/8 rule."
   (lambda (l u &optional (n 3))
     (let* ((n (- n (second (multiple-value-list (ceiling n 3))))) ; multiple of 3
            (h (/ (- u l) n)))
@@ -96,9 +119,19 @@
                                    (t (* 3 fx))))))))
 
 (defmacro piecewise/4+ ((x) f)
+  "Create a lambda that integrates a region over `F`. The lambda takes
+the lower and upper limits of the region as parameters, and optionally
+the number of segments to divide the region into (which will be
+incremented to make divisible by 3 if necessary). The algorithm used is
+piecewise cubic approximation, i.e. Simpson's 3/8 rule."
   `(piecewise/4 (lambda (,x) ,f)))
 
 (defun piecewise/5 (f)
+  "Create a lambda that integrates a region over `F`. The lambda takes
+the lower and upper limits of the region as parameters, and optionally
+the number of segments to divide the region into (which will be
+incremented to make divisible by 4 if necessary). The algorithm used is
+piecewise quartic approximation, i.e. Boole's (or Bode's) rule."
   (lambda (l u &optional (n 4))
     (let* ((n (- n (second (multiple-value-list (ceiling n 4))))) ; multiple of 4
            (h (/ (- u l) n)))
@@ -112,9 +145,21 @@
                                        (t (* 32 fx))))))))
 
 (defmacro piecewise/5+ ((x) f)
+  "Create a lambda that integrates a region over `F`. The lambda takes
+the lower and upper limits of the region as parameters, and optionally
+the number of segments to divide the region into (which will be
+incremented to make divisible by 4 if necessary). The algorithm used is
+piecewise quartic approximation, i.e. Boole's (or Bode's) rule."
   `(piecewise/5 (lambda (,x) ,f)))
 
 (defun romberg (f &key (integrator #'piecewise/2) ratio-limit (tolerance +tolerance+) (limit +limit+))
+  "Create a lambda that attempts to integrate a region over `F` to the
+specified accuracy, within the specified limit of iteration, by
+applying richardson extrapolation to the specified integrator. If
+`RATIO-LIMIT` is specified, it is the amount of deviation allowed to
+the ratio of error reduction between consecutive steps, which should
+normally be around 4; the deviation allowed should be around 0.4, or
+leave NIL to disable this feature."
   (let ((integrator (funcall integrator f)))
     (labels ((rec (l u &optional (i 1) (Ih*2 (funcall integrator l u 1)) Pext Ih*4)
                (let* ((n (expt 2 i))
@@ -139,9 +184,24 @@
       #'rec)))
 
 (defmacro romberg+ ((x &key (integrator #'piecewise/2) ratio-limit (tolerance +tolerance+) (limit +limit+)) f)
+  "Create a lambda that attempts to integrate a region over `F` to the
+specified accuracy, within the specified limit of iteration, by
+applying richardson extrapolation to the specified integrator. If
+`RATIO-LIMIT` is specified, it is the amount of deviation allowed to
+the ratio of error reduction between consecutive steps, which should
+normally be around 4; the deviation allowed should be around 0.4, or
+leave NIL to disable this feature."
   `(romberg (lambda (,x) ,f) :integrator ,integrator :ratio-limit ,ratio-limit :tolerance ,tolerance :limit ,limit))
-                         
+
 (defun euler-mcclaurin (f &optional df df3)
+  "Create a lambda that integrates a region over `F`, where `DF` is
+the first derivative function of `F` and `DF3` is the third derivative
+function of `F`. `DF` and `DF3` are both optional; if neither is
+specified, the behavior is identical to piecewise/2. Otherwise the
+derivative functions are used with the Euler-McClaurin integration
+rule to improve accuracy. The lambda takes the lower and upper limits
+of the region as parameters, and optionally the number of segments to
+divide the region into.."
   (lambda (l u &optional (n 1) (integrator (piecewise/2 f)))
     (let ((h (/ (- u l) n))
           (df (if df
@@ -153,9 +213,21 @@
       (+ (funcall integrator l u n) (* (/ 1d0 12) h h df) (* (/ -1d0 720) h h h h df3)))))
 
 (defmacro euler-mcclaurin+ ((x) f &optional df df3)
+  "Create a lambda that integrates a region over `F`, where `DF` is
+the first derivative function of `F` and `DF3` is the third derivative
+function of `F`. `DF` and `DF3` are both optional; if neither is
+specified, the behavior is identical to piecewise/2. Otherwise the
+derivative functions are used with the Euler-McClaurin integration
+rule to improve accuracy. The lambda takes the lower and upper limits
+of the region as parameters, and optionally the number of segments to
+divide the region into.."
   `(euler-mcclaurin (lambda (,x) ,f) ,(if df `(lambda (,x) ,df) `nil) ,(if df3 `(lambda (,x) ,df3) `nil)))
 
 (defun gaussian-quadrature/n (f n)
+  "Create a lambda that integrates a region over `F`. The lambda takes
+the lower and upper limits of the region as parameters. `N` specifies
+the order of the Legendre polynomial to use for the integration rule,
+which can range from 2 to 9."
   (flet ((gq (ti ci)
            (lambda (a b)
              (let ((m (/ (- b a) 2d0))
@@ -191,9 +263,17 @@
                                     0.312347077040003d0 0.260610696402935d0 0.180648160694857d0 0.081274388361574d0)))))))
 
 (defmacro gaussian-quadrature/n+ ((x n) f)
+  "Create a lambda that integrates a region over `F`. The lambda takes
+the lower and upper limits of the region as parameters. `N` specifies
+the order of the Legendre polynomial to use for the integration rule,
+which can range from 2 to 9."
   `(gaussian-quadrature/n (lambda (,x) ,f) ,n))
 
 (defun composite/n (f &key (n 1) (integrator #'gauss-legendre/4))
+  "Create a lambda that integrates a region over `F`. The region will
+be divided into `N` segments, and `INTEGRATOR` will be used to
+integrate each segment. The lambda takes the lower and upper limits of
+the region as parameters."
   (let ((integrator (funcall integrator f)))
     (lambda (a b)
       (let ((h (/ (- b a) n)))
@@ -203,9 +283,16 @@
            summing (funcall integrator l u))))))
 
 (defmacro composite/n+ ((x &key (n 1) (integrator #'gauss-legendre/4)) f)
+  "Create a lambda that integrates a region over `F`. The region will
+be divided into `N` segments, and `INTEGRATOR` will be used to
+integrate each segment. The lambda takes the lower and upper limits of
+the region as parameters."
   `(composite/n+ (lambda (,x) ,f) :n ,n :integrator ,integrator))
 
 (defun laguerre-quadrature/n (f n)
+  "Create a lambda that integrates the region from 0 to infinity over `F`.
+`N` specifies the order of the Laguerre polynomial to use for the
+integration rule, which can be 2,4,6, or 8."
   (flet ((lq (ti ci)
            (lambda ()
              (loop for v in ti
@@ -233,20 +320,27 @@
                                     .0000008485746716272532d0 .000000001048001174871510d0)))))))
 
 (defmacro laguerre-quadrature/n+ ((x n) f)
+  "Create a lambda that integrates the region from 0 to infinity over `F`.
+`N` specifies the order of the Laguerre polynomial to use for the
+integration rule, which can be 2,4,6, or 8."
   `(laguerre-quadrature/n (lambda (,x) ,f) n))
 
 (eval-when (:execute :load-toplevel :compile-toplevel)
   (defun defgaussian (n)
     `(defun ,(intern (format nil "GAUSS-LEGENDRE/~A" n)) (f)
+       ,(format nil "Create a lambda that integrates a region over `F` using a Legendre polyomial~%of order ~A. The lambda takes the lower and upper limits of the region as parameters." n)
        (gaussian-quadrature/n f ,n)))
   (defun defgaussian+ (n)
     `(defmacro ,(intern (format nil "GAUSS-LEGENDRE/~A+" n)) ((x) f)
+       ,(format nil "Create a lambda that integrates a region over `F` using a Legendre polyomial~%of order ~A. The lambda takes the lower and upper limits of the region as parameters." n)
        `(gaussian-quadrature/n (lambda (,x) ,f) ,,n)))
   (defun deflaguerre (n)
     `(defun ,(intern (format nil "GAUSS-LAGUERRE/~A" n)) (f)
+       ,(format nil "Create a lambda that integrates the region from 0 to infinity over `F` using a Laguerre polyomial of order ~A." n)
        (laguerre-quadrature/n f ,n)))
   (defun deflaguerre+ (n)
     `(defmacro ,(intern (format nil "GAUSS-LAGUERRE/~A+" n)) ((x) f)
+       ,(format nil "Create a lambda that integrates the region from 0 to infinity over `F` using a Laguerre polyomial of order ~A." n)
        `(laguerre-quadrature/n (lambda (,x) ,f) ,,n)))
   (loop for i from 2 to 9 do (eval (defgaussian i)) (eval (defgaussian+ i)))
   (loop for i from 2 to 8 by 2 do (eval (deflaguerre i)) (eval (deflaguerre+ i))))
