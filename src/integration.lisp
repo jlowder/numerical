@@ -7,12 +7,19 @@
                 :+tolerance+
                 :+limit+)
   (:export :piecewise/2
+           :piecewise/2+
            :piecewise/3
+           :piecewise/3+
            :piecewise/4
+           :piecewise/4+
            :piecewise/5
+           :piecewise/5+
            :euler-mcclaurin
+           :euler-mcclaurin+
            :romberg
+           :romberg+
            :gaussian-quadrature/n
+           :gaussian-quadrature/n+
            :gauss-legendre/2
            :gauss-legendre/3
            :gauss-legendre/4
@@ -26,8 +33,12 @@
            :gauss-laguerre/6
            :gauss-laguerre/8
            :composite/n
+           :composite/n+
            :composite
-           :laguerre-quadrature/n))
+           :composite+
+           :laguerre-quadrature/n
+           :piecewise
+           :piecewise+))
 
 (in-package :numerical.integration)
 
@@ -41,6 +52,9 @@
                    summing (cond ((or (eq i 0) (eq i n)) fx)
                                  (t (* 2 fx))))))))
 
+(defmacro piecewise/2+ ((x) f)
+  `(piecewise/2 (lambda (,x) ,f)))
+
 (defun piecewise/3 (f)
   (lambda (l u &optional (n 2))
     (let* ((n (if (oddp n) (1+ n) n)) ; force n to be even
@@ -53,6 +67,9 @@
                                       ((oddp i) (* 4 fx))
                                       (t (* 2 fx))))))))
 
+(defmacro piecewise/3+ ((x) f)
+  `(piecewise/3 (lambda (,x) ,f)))
+
 (defun piecewise/4 (f)
   (lambda (l u &optional (n 3))
     (let* ((n (- n (second (multiple-value-list (ceiling n 3))))) ; multiple of 3
@@ -64,6 +81,9 @@
                      summing (cond ((or (eq i 0) (eq i n)) fx)
                                    ((eq (mod i 3) 0) (* 2 fx))
                                    (t (* 3 fx))))))))
+
+(defmacro piecewise/4+ ((x) f)
+  `(piecewise/4 (lambda (,x) ,f)))
 
 (defun piecewise/5 (f)
   (lambda (l u &optional (n 4))
@@ -78,7 +98,10 @@
                                        ((eq (mod i 4) 2) (* 12 fx))
                                        (t (* 32 fx))))))))
 
-(defun romberg (f &optional (integrator #'piecewise/2) Rcheck (tolerance +tolerance+) (limit +limit+))
+(defmacro piecewise/5+ ((x) f)
+  `(piecewise/5 (lambda (,x) ,f)))
+
+(defun romberg (f &key (integrator #'piecewise/2) ratio-limit (tolerance +tolerance+) (limit +limit+))
   (let ((integrator (funcall integrator f)))
     (labels ((rec (l u &optional (i 1) (Ih*2 (funcall integrator l u 1)) Pext Ih*4)
                (let* ((n (expt 2 i))
@@ -88,8 +111,8 @@
                       (ext (+ Ih err3))
                       (err (if Pext (* (/_ 1d0 div) (- ext Pext)) err3))
                       (ext2 (+ ext err))
-                      (R (if (and Rcheck Ih*4 (not (equal Ih*2 Ih))) (abs (/_ (- Ih*4 Ih*2)
-                                                                              (- Ih*2 Ih)))
+                      (R (if (and ratio-limit Ih*4 (not (equal Ih*2 Ih))) (abs (/_ (- Ih*4 Ih*2)
+                                                                                   (- Ih*2 Ih)))
                              4)))
                  (if (and Pext
                           (> i 3)
@@ -97,11 +120,14 @@
                           (< (abs (/_ (- Ih Ih*2) Ih)) tolerance))
                      (values ext2 t i)
                      (if (and (< i limit)
-                              (or (<= i 3) (> (if Rcheck Rcheck .4d0) (abs (- 4 R)))))
+                              (or (<= i 3) (> (if ratio-limit ratio-limit .4d0) (abs (- 4 R)))))
                          (rec l u (1+ i) Ih ext2 Ih*2)
                          (values ext2 nil i))))))
       #'rec)))
 
+(defmacro romberg+ ((x &key (integrator #'piecewise/2) ratio-limit (tolerance +tolerance+) (limit +limit+)) f)
+  `(romberg (lambda (,x) ,f) :integrator ,integrator :ratio-limit ,ratio-limit :tolerance ,tolerance :limit ,limit))
+                         
 (defun euler-mcclaurin (f &optional df df3)
   (lambda (l u &optional (n 1) (integrator (piecewise/2 f)))
     (let ((h (/ (- u l) n))
@@ -112,6 +138,9 @@
                    (- (funcall df3 l) (funcall df3 u))
                    0)))
       (+ (funcall integrator l u n) (* (/ 1d0 12) h h df) (* (/ -1d0 720) h h h h df3)))))
+
+(defmacro euler-mcclaurin+ ((x) f &optional df df3)
+  `(euler-mcclaurin (lambda (,x) ,f) ,(if df `(lambda (,x) ,df) `nil) ,(if df3 `(lambda (,x) ,df3) `nil)))
 
 (defun gaussian-quadrature/n (f n)
   (flet ((gq (ti ci)
@@ -148,7 +177,10 @@
                                    (0.081274388361574d0 0.180648160694857d0 0.260610696402935d0 0.312347077040003d0 0.33023935501260d0
                                     0.312347077040003d0 0.260610696402935d0 0.180648160694857d0 0.081274388361574d0)))))))
 
-(defun composite/n (f &optional (n 1) (integrator #'gauss-legendre/4))
+(defmacro gaussian-quadrature/n+ ((x n) f)
+  `(gaussian-quadrature/n (lambda (,x) ,f) ,n))
+
+(defun composite/n (f &key (n 1) (integrator #'gauss-legendre/4))
   (let ((integrator (funcall integrator f)))
     (lambda (a b)
       (let ((h (/ (- b a) n)))
@@ -156,6 +188,9 @@
            as l = a then (+ l h)
            as u = (+ a h) then (+ u h)
            summing (funcall integrator l u))))))
+
+(defmacro composite/n+ ((x &key (n 1) (integrator #'gauss-legendre/4)) f)
+  `(composite/n+ (lambda (,x) ,f) :n ,n :integrator ,integrator))
 
 (defun laguerre-quadrature/n (f n)
   (flet ((lq (ti ci)
@@ -197,9 +232,18 @@
 (defun composite (f &key (integrator #'gauss-legendre/4) (tolerance +tolerance+) (limit +limit+))
   (lambda (a b)
     (loop for x from 2 to (1- limit)
-       as iny = (funcall (composite/n f x integrator) a b) then inx
-       as inx = (funcall (composite/n f (1+ x) integrator) a b)
+       as iny = (funcall (composite/n f :n x :integrator integrator) a b) then inx
+       as inx = (funcall (composite/n f :n (1+ x) :integrator integrator) a b)
        as corr = (abs (/_ (- inx iny) inx))
        do (when (> tol corr) (return (values inx t x)))
        finally (return (values inx nil x)))))
+
+(defmacro composite+ ((x &key (integrator #'gauss-legendre/4) (tolerance +tolerance+) (limit +limit+)) f)
+  `(composite (lambda (,x) ,f) :integrator ,integrator :tolerance ,tolerance :limit ,limit))
+
+(defun piecewise (f &key (tolerance +tolerance+) (limit +limit+))
+  (composite f :integrator #'piecewise/2 :tolerance tolerance :limit limit))
+
+(defmacro piecewise+ ((x &key (tolerance +tolerance+) (limit +limit+)) f)
+  `(piecewise (lambda (,x) ,f) :tolerance ,tolerance :limit ,limit))
 

@@ -24,6 +24,10 @@
 (in-package :numerical.roots)
 
 (defun bisect (f &key (tolerance +tolerance+) (limit +limit+))
+  "Create a lambda for attempting to find a root of `F` between two
+values, to a specified accuracy and within a specified number of
+iteration attempts. The lambda will use a brute-force bisection
+algorithm."
   (labels ((rec (left right &optional (cnt 0) (fleft (funcall f left)) (fright (funcall f right)))
              (let* ((middle (* 0.5d0 (+ left right)))
                     (fmid (funcall f middle)))
@@ -38,10 +42,18 @@
                            (rec middle right (1+ cnt) fmid fright)))))))
     #'rec))
 
-(defmacro bisect+ ((x &key (tolerance +tolerance+) (limit +limit+)) &rest rest)
-  `(bisect (lambda (,x) ,@rest) :tolerance ,tolerance :limit ,limit))
+(defmacro bisect+ ((x &key (tolerance +tolerance+) (limit +limit+)) f)
+  "Create a lambda for finding a root of `F` between two values, to a
+specified accuracy and within a specified number of iteration
+attempts. The lambda will use a brute-force bisection algorithm."
+  `(bisect (lambda (,x) ,f) :tolerance ,tolerance :limit ,limit))
 
 (defun newton-raphson (f df &key (tolerance +tolerance+) (limit +limit+))
+  "Create a lambda for finding a root of `F` between two values, to a
+specified accuracy and within a specified number of iteration
+attempts. The lambda will use the newton-raphson algorithm, which
+requires the derivative of the function to also be be provided, to
+quickly converge on the solution."
   (labels ((rec (guess &optional (cnt 0))
              (if (>= cnt limit)
                  (values guess nil limit)
@@ -52,9 +64,18 @@
     #'rec))
 
 (defmacro newton-raphson+ ((x &key (tolerance +tolerance+) (limit +limit+)) f df)
+  "Create a lambda for finding a root of `F` between two values, to a
+specified accuracy and within a specified number of iteration
+attempts. The lambda will use the newton-raphson algorithm, which
+requires the derivative of the function to also be be provided, to
+quickly converge on the solution."
   `(newton-raphson (lambda (,x) ,f) (lambda (,x) ,df) :tolerance ,tolerance :limit ,limit))
 
 (defun nr/bisect (f df &key (tolerance +tolerance+) (limit +limit+))
+  "Create a lambda for finding a root of `F` between two values, to a
+specified accuracy and within a specified number of iteration
+attempts. The lambda will use a hybrid algorithm that decides on each
+iteration whether to take a newton-raphson step or a bisection step."
   (labels ((rec (left right &optional
                       (cnt 0)
                       (fleft (funcall f left))
@@ -86,6 +107,9 @@
   `(nr/bisect (lambda (,x) ,f) (lambda (,x) ,df) :tolerance ,tolerance :limit ,limit))
 
 (defun root-brackets (f &key (steps 100))
+  "Create a lambda that will search for pairs of values that bracket
+the roots of `F`. `STEPS` determines the number of intervals that will
+be sampled. A list of value pairs will be returned."
   (lambda (left right)
     (loop
        for px = left then x
@@ -96,10 +120,17 @@
        until (>= x right)
        finally (return res))))
 
-(defmacro root-brackets+ ((x &key (steps 100)) &rest rest)
-  `(root-brackets (lambda (,x) ,@rest) :steps ,steps))
+(defmacro root-brackets+ ((x &key (steps 100)) f)
+  "Create a lambda that will search for pairs of values that bracket
+the roots of `F`. `STEPS` determines the number of intervals that will
+be sampled. A list of value pairs will be returned."
+  `(root-brackets (lambda (,x) ,f) :steps ,steps))
 
 (defun false-position (f &key (tolerance +tolerance+) (limit +limit+))
+  "Create a lambda for attempting to find a root of `F` between two
+values, to a specified accuracy and within a specified number of
+iteration attempts. The lambda will use the method of false position
+to converge on the solution."
   (labels ((rec (left right &optional
                       (cnt 0)
                       (prev right)
@@ -118,10 +149,19 @@
                            (rec guess right (1+ cnt) guess fguess fright)))))))
     #'rec))
 
-(defmacro false-position+ ((x &key (tolerance +tolerance+) (limit +limit+)) &rest rest)
-  `(false-position (lambda (,x) ,@rest) :tolerance ,tolerance :limit ,limit))
+(defmacro false-position+ ((x &key (tolerance +tolerance+) (limit +limit+)) f)
+  "Create a lambda for attempting to find a root of `F` between two
+values, to a specified accuracy and within a specified number of
+iteration attempts. The lambda will use the method of false position
+to converge on the solution."
+  `(false-position (lambda (,x) ,f) :tolerance ,tolerance :limit ,limit))
 
 (defun secant/bisect (f &key (tolerance +tolerance+) (limit +limit+))
+  "Create a lambda for attempting to find a root of `F` between two
+values, to a specified accuracy and within a specified number of
+iteration attempts. The lambda will use the Secant method to converge
+on the solution, but reverts to the bisection method if unable to
+converge."
   (let ((bistepper (bisect f :tolerance tolerance :limit 1)))
     (labels ((secant (xi-1 xi)
                (let ((fxi-1 (funcall f xi-1))
@@ -149,10 +189,20 @@
                                  (rec guess right (1+ cnt) fguess fright guess xi guess))))))))
       #'rec)))
 
-(defmacro secant/bisect+ ((x &key (tolerance +tolerance+) (limit +limit+)) &rest rest)
-  `(secant/bisect (lambda (,x) ,@rest) :tolerance ,tolerance :limit ,limit))
+(defmacro secant/bisect+ ((x &key (tolerance +tolerance+) (limit +limit+)) f)
+  "Create a lambda for attempting to find a root of `F` between two
+values, to a specified accuracy and within a specified number of
+iteration attempts. The lambda will use the Secant method to converge
+on the solution, but reverts to the bisection method if unable to
+converge."
+  `(secant/bisect (lambda (,x) ,f) :tolerance ,tolerance :limit ,limit))
 
 (defun quadratic/bisect (f &key (tolerance +tolerance+) (limit +limit+))
+  "Create a lambda for attempting to find a root of `F` between two
+values, to a specified accuracy and within a specified number of
+iteration attempts. The lambda will use a quadratic approximation
+method to converge on the solution, but reverts to the bisection
+method if unable to converge."
   (let ((bistepper (bisect f :tolerance tolerance :limit 2)))
     (labels ((quadratic (x0 x1 x2)
                (if (or
@@ -165,9 +215,9 @@
                           (fx2 (funcall f x2))
                           (c fx2)
                           (b (/_ (- (* (- x0 x2) (- x0 x2) (- fx1 fx2)) (* (- x1 x2) (- x1 x2) (- fx0 fx2)))
-                                (* (- x0 x1) (- x0 x2) (- x1 x2))))
+                                 (* (- x0 x1) (- x0 x2) (- x1 x2))))
                           (a (/_ (- (* (- x1 x2) (- fx0 fx2)) (* (- x0 x2) (- fx1 fx2)))
-                                (* (- x0 x1) (- x0 x2) (- x1 x2))))
+                                 (* (- x0 x1) (- x0 x2) (- x1 x2))))
                           (numer (- 0d0 c c))
                           (denom+ (+ b (expt (- (* b b) (* 4 a c)) .5d0)))
                           (denom- (- b (expt (- (* b b) (* 4 a c)) .5d0))))
@@ -197,4 +247,9 @@
       #'rec)))
 
 (defmacro quadratic/bisect+ ((x &key (tolerance +tolerance+) (limit +limit+)) &rest rest)
+  "Create a lambda for attempting to find a root of `F` between two
+values, to a specified accuracy and within a specified number of
+iteration attempts. The lambda will use a quadratic approximation
+method to converge on the solution, but reverts to the bisection
+method if unable to converge."
   `(quadratic/bisect (lambda (,x) ,@rest) :tolerance ,tolerance :limit ,limit))
