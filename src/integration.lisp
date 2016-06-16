@@ -20,23 +20,36 @@
            :romberg+
            :gaussian-quadrature/n
            :gaussian-quadrature/n+
-           :gauss-legendre/2
-           :gauss-legendre/3
-           :gauss-legendre/4
-           :gauss-legendre/5
-           :gauss-legendre/6
-           :gauss-legendre/7
-           :gauss-legendre/8
-           :gauss-legendre/9
            :gauss-laguerre/2
+           :gauss-laguerre/2+
            :gauss-laguerre/4
+           :gauss-laguerre/4+
            :gauss-laguerre/6
+           :gauss-laguerre/6+
            :gauss-laguerre/8
+           :gauss-laguerre/8+
+           :gauss-legendre/2
+           :gauss-legendre/2+
+           :gauss-legendre/3
+           :gauss-legendre/3+
+           :gauss-legendre/4
+           :gauss-legendre/4+
+           :gauss-legendre/5
+           :gauss-legendre/5+
+           :gauss-legendre/6
+           :gauss-legendre/6+
+           :gauss-legendre/7
+           :gauss-legendre/7+
+           :gauss-legendre/8
+           :gauss-legendre/8+
+           :gauss-legendre/9
+           :gauss-legendre/9+
            :composite/n
            :composite/n+
            :composite
            :composite+
            :laguerre-quadrature/n
+           :laguerre-quadrature/n+
            :piecewise
            :piecewise+))
 
@@ -219,15 +232,24 @@
                                     .002794536235225673d0 .00009076508773358213d0
                                     .0000008485746716272532d0 .000000001048001174871510d0)))))))
 
+(defmacro laguerre-quadrature/n+ ((x n) f)
+  `(laguerre-quadrature/n (lambda (,x) ,f) n))
+
 (eval-when (:execute :load-toplevel :compile-toplevel)
   (defun defgaussian (n)
     `(defun ,(intern (format nil "GAUSS-LEGENDRE/~A" n)) (f)
        (gaussian-quadrature/n f ,n)))
+  (defun defgaussian+ (n)
+    `(defmacro ,(intern (format nil "GAUSS-LEGENDRE/~A+" n)) ((x) f)
+       `(gaussian-quadrature/n (lambda (,x) ,f) ,,n)))
   (defun deflaguerre (n)
     `(defun ,(intern (format nil "GAUSS-LAGUERRE/~A" n)) (f)
        (laguerre-quadrature/n f ,n)))
-  (loop for i from 2 to 9 do (eval (defgaussian i)))
-  (loop for i from 2 to 8 by 2 do (eval (deflaguerre i))))
+  (defun deflaguerre+ (n)
+    `(defmacro ,(intern (format nil "GAUSS-LAGUERRE/~A+" n)) ((x) f)
+       `(laguerre-quadrature/n (lambda (,x) ,f) ,,n)))
+  (loop for i from 2 to 9 do (eval (defgaussian i)) (eval (defgaussian+ i)))
+  (loop for i from 2 to 8 by 2 do (eval (deflaguerre i)) (eval (deflaguerre+ i))))
 
 (defun composite (f &key (integrator #'gauss-legendre/4) (tolerance +tolerance+) (limit +limit+))
   (lambda (a b)
