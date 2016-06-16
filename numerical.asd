@@ -10,7 +10,5 @@
               :components
               ((:file "numerical")
                (:file "roots")
-;;               (:file "interpolation")
-;;               (:file "integration")))))
-                        
-))))
+               (:file "interpolation")
+               (:file "integration")))))
