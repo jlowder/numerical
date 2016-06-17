@@ -1,0 +1,19 @@
+#!/bin/sh
+#|-*- mode:lisp -*-|#
+#|
+exec ros -Q -- $0 "$@"
+|#
+(ql:quickload '(:numerical :plot2d))
+(defpackage :ros.script.exercise.3672756171
+  (:use :cl :numerical.interpolation :plot2d))
+(in-package :ros.script.exercise.3672756171)
+
+(defun main (&rest argv)
+  (declare (ignorable argv))
+  (let ((gen (make-instance 'plot2d))
+        ;; Bessel function of order 1, sampled from 0 to 10
+        (j1 '(0.0d0 0.4400505857d0 0.5767248078d0 0.3390589585d0 -0.0660433280d0 -0.3275791376d0 -0.2766838581d0 -0.0046828235d0 0.2346363469d0 0.2453117866d0 0.0434727462d0)))
+    (setf (palette (theme gen)) '((0.6 0.0 0.45) (0.6 0.0 0.45)))
+    (setf (style (theme gen)) (list :solid (make-instance 'marker :size 3 :filled t :fill-color (background (theme gen)))))
+    (plot gen (lagrange-polynomial (loop for i from 0 to 10 collect i) j1) :range '(0 10) :aspect (/ 16 9) :format :svg :filename "bessel.svg")
+    (plot/xy gen (loop for x from 0 to 10 collect x) j1)))

@@ -594,10 +594,10 @@ leave NIL to disable this feature.</p>
   </div>
   <div class='apiref-lambda'>(F &amp;KEY (TOLERANCE +TOLERANCE+) (LIMIT +LIMIT+))
   </div>
-  <div class='apiref-doc'><p>Create a lambda for attempting to find a root of <code>F</code> between two
-values, to a specified accuracy and within a specified number of
-iteration attempts. The lambda will use a brute-force bisection
-algorithm.</p>
+  <div class='apiref-doc'><p>Create a lambda for finding a root of <code>F</code> between two values, to a
+specified accuracy and within a specified number of iteration
+attempts. The lambda takes the lower and upper values as parameters
+and will use a brute-force bisection algorithm to find a root.</p>
 
   </div>
 </section>
@@ -609,7 +609,8 @@ algorithm.</p>
   <div class='apiref-doc'><p>Create a lambda for attempting to find a root of <code>F</code> between two
 values, to a specified accuracy and within a specified number of
 iteration attempts. The lambda will use the method of false position
-to converge on the solution.</p>
+to converge on the solution. The lambda takes the lower and upper
+values as parameters.</p>
 
   </div>
 </section>
@@ -618,23 +619,24 @@ to converge on the solution.</p>
   </div>
   <div class='apiref-lambda'>(F DF &amp;KEY (TOLERANCE +TOLERANCE+) (LIMIT +LIMIT+))
   </div>
-  <div class='apiref-doc'><p>Create a lambda for finding a root of <code>F</code> between two values, to a
-specified accuracy and within a specified number of iteration
-attempts. The lambda will use the newton-raphson algorithm, which
-requires the derivative of the function to also be be provided, to
-quickly converge on the solution.</p>
+  <div class='apiref-doc'><p>Create a lambda for finding a root of <code>F</code>, to a specified accuracy
+and within a specified number of iteration attempts. The lambda will
+use the newton-raphson algorithm (which requires the derivative of the
+function to be provided as <code>DF</code>) to converge on the solution. The
+lambda takes a guess to the solution as a parameter.</p>
 
   </div>
 </section>
-<section id='apiref-nr/bisect' class='section-apiref-item'>
-  <div class='apiref-spec'>NR/BISECT
+<section id='apiref-newton-raphson/bisect' class='section-apiref-item'>
+  <div class='apiref-spec'>NEWTON-RAPHSON/BISECT
   </div>
   <div class='apiref-lambda'>(F DF &amp;KEY (TOLERANCE +TOLERANCE+) (LIMIT +LIMIT+))
   </div>
   <div class='apiref-doc'><p>Create a lambda for finding a root of <code>F</code> between two values, to a
 specified accuracy and within a specified number of iteration
 attempts. The lambda will use a hybrid algorithm that decides on each
-iteration whether to take a newton-raphson step or a bisection step.</p>
+iteration whether to take a newton-raphson step or a bisection
+step. The lambda takes the lower and upper values as parameters.</p>
 
   </div>
 </section>
@@ -647,7 +649,8 @@ iteration whether to take a newton-raphson step or a bisection step.</p>
 values, to a specified accuracy and within a specified number of
 iteration attempts. The lambda will use a quadratic approximation
 method to converge on the solution, but reverts to the bisection
-method if unable to converge.</p>
+method if unable to converge. The lambda takes the lower and upper
+values as parameters.</p>
 
   </div>
 </section>
@@ -671,7 +674,7 @@ be sampled. A list of value pairs will be returned.</p>
 values, to a specified accuracy and within a specified number of
 iteration attempts. The lambda will use the Secant method to converge
 on the solution, but reverts to the bisection method if unable to
-converge.</p>
+converge. The lambda takes the lower and upper values as parameters.</p>
 
   </div>
 </section>
@@ -686,7 +689,8 @@ converge.</p>
   </div>
   <div class='apiref-doc'><p>Create a lambda for finding a root of <code>F</code> between two values, to a
 specified accuracy and within a specified number of iteration
-attempts. The lambda will use a brute-force bisection algorithm.</p>
+attempts. The lambda takes the lower and upper values as parameters
+and will use a brute-force bisection algorithm to find a root.</p>
 
   </div>
 </section>
@@ -698,7 +702,8 @@ attempts. The lambda will use a brute-force bisection algorithm.</p>
   <div class='apiref-doc'><p>Create a lambda for attempting to find a root of <code>F</code> between two
 values, to a specified accuracy and within a specified number of
 iteration attempts. The lambda will use the method of false position
-to converge on the solution.</p>
+to converge on the solution. The lambda takes the lower and upper
+values as parameters.</p>
 
   </div>
 </section>
@@ -707,20 +712,24 @@ to converge on the solution.</p>
   </div>
   <div class='apiref-lambda'>((X &amp;KEY (TOLERANCE +TOLERANCE+) (LIMIT +LIMIT+)) F DF)
   </div>
-  <div class='apiref-doc'><p>Create a lambda for finding a root of <code>F</code> between two values, to a
-specified accuracy and within a specified number of iteration
-attempts. The lambda will use the newton-raphson algorithm, which
-requires the derivative of the function to also be be provided, to
-quickly converge on the solution.</p>
+  <div class='apiref-doc'><p>Create a lambda for finding a root of <code>F</code>, to a specified accuracy
+and within a specified number of iteration attempts. The lambda will
+use the newton-raphson algorithm (which requires the derivative of the
+function to be provided as <code>DF</code>) to converge on the solution. The
+lambda takes a guess to the solution as a parameter.</p>
 
   </div>
 </section>
-<section id='apiref-nr/bisect+' class='section-apiref-item'>
-  <div class='apiref-spec'>NR/BISECT+
+<section id='apiref-newton-raphson/bisect+' class='section-apiref-item'>
+  <div class='apiref-spec'>NEWTON-RAPHSON/BISECT+
   </div>
   <div class='apiref-lambda'>((X &amp;KEY (TOLERANCE +TOLERANCE+) (LIMIT +LIMIT+)) F DF)
   </div>
-  <div class='apiref-doc'><p><em>Undocumented!</em></p>
+  <div class='apiref-doc'><p>Create a lambda for finding a root of <code>F</code> between two values, to a
+specified accuracy and within a specified number of iteration
+attempts. The lambda will use a hybrid algorithm that decides on each
+iteration whether to take a newton-raphson step or a bisection
+step. The lambda takes the lower and upper values as parameters.</p>
 
   </div>
 </section>
@@ -733,7 +742,8 @@ quickly converge on the solution.</p>
 values, to a specified accuracy and within a specified number of
 iteration attempts. The lambda will use a quadratic approximation
 method to converge on the solution, but reverts to the bisection
-method if unable to converge.</p>
+method if unable to converge. The lambda takes the lower and upper
+values as parameters.</p>
 
   </div>
 </section>
@@ -757,7 +767,7 @@ be sampled. A list of value pairs will be returned.</p>
 values, to a specified accuracy and within a specified number of
 iteration attempts. The lambda will use the Secant method to converge
 on the solution, but reverts to the bisection method if unable to
-converge.</p>
+converge. The lambda takes the lower and upper values as parameters.</p>
 
   </div>
 </section>
