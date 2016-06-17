@@ -328,24 +328,29 @@ integration rule, which can be 2,4,6, or 8."
 (eval-when (:execute :load-toplevel :compile-toplevel)
   (defun defgaussian (n)
     `(defun ,(intern (format nil "GAUSS-LEGENDRE/~A" n)) (f)
-       ,(format nil "Create a lambda that integrates a region over `F` using a Legendre polyomial~%of order ~A. The lambda takes the lower and upper limits of the region as parameters." n)
+       ,(format nil "Create a lambda that integrates a region over `F` using a Legendre polynomial~%of order ~A. The lambda takes the lower and upper limits of the region as parameters." n)
        (gaussian-quadrature/n f ,n)))
   (defun defgaussian+ (n)
     `(defmacro ,(intern (format nil "GAUSS-LEGENDRE/~A+" n)) ((x) f)
-       ,(format nil "Create a lambda that integrates a region over `F` using a Legendre polyomial~%of order ~A. The lambda takes the lower and upper limits of the region as parameters." n)
+       ,(format nil "Create a lambda that integrates a region over `F` using a Legendre polynomial~%of order ~A. The lambda takes the lower and upper limits of the region as parameters." n)
        `(gaussian-quadrature/n (lambda (,x) ,f) ,,n)))
   (defun deflaguerre (n)
     `(defun ,(intern (format nil "GAUSS-LAGUERRE/~A" n)) (f)
-       ,(format nil "Create a lambda that integrates the region from 0 to infinity over `F` using a Laguerre polyomial of order ~A." n)
+       ,(format nil "Create a lambda that integrates the region from 0 to infinity over `F` using a Laguerre polynomial of order ~A." n)
        (laguerre-quadrature/n f ,n)))
   (defun deflaguerre+ (n)
     `(defmacro ,(intern (format nil "GAUSS-LAGUERRE/~A+" n)) ((x) f)
-       ,(format nil "Create a lambda that integrates the region from 0 to infinity over `F` using a Laguerre polyomial of order ~A." n)
+       ,(format nil "Create a lambda that integrates the region from 0 to infinity over `F` using a Laguerre polynomial of order ~A." n)
        `(laguerre-quadrature/n (lambda (,x) ,f) ,,n)))
   (loop for i from 2 to 9 do (eval (defgaussian i)) (eval (defgaussian+ i)))
   (loop for i from 2 to 8 by 2 do (eval (deflaguerre i)) (eval (deflaguerre+ i))))
 
 (defun composite (f &key (integrator #'gauss-legendre/4) (tolerance +tolerance+) (limit +limit+))
+  "Create a lambda that integrates a region over `F`.
+`INTEGRATOR` specifies the algorithm to use. The region will be
+subdivided into progressively smaller regions in order to converge to
+the specified accuracy, within the specified iteration limit. The
+lambda takes the lower and upper limits of the region as parameters."
   (lambda (a b)
     (loop for x from 2 to (1- limit)
        as iny = (funcall (composite/n f :n x :integrator integrator) a b) then inx
@@ -355,11 +360,26 @@ integration rule, which can be 2,4,6, or 8."
        finally (return (values inx nil x)))))
 
 (defmacro composite+ ((x &key (integrator #'gauss-legendre/4) (tolerance +tolerance+) (limit +limit+)) f)
+  "Create a lambda that integrates a region over `F`.
+`INTEGRATOR` specifies the algorithm to use. The region will be
+subdivided into progressively smaller regions in order to converge to
+the specified accuracy, within the specified iteration limit. The
+lambda takes the lower and upper limits of the region as parameters."
   `(composite (lambda (,x) ,f) :integrator ,integrator :tolerance ,tolerance :limit ,limit))
 
 (defun piecewise (f &key (tolerance +tolerance+) (limit +limit+))
+  "Create a lambda that integrates a region over `F`.
+using piecewise composite algorithms. The region will be subdivided
+into progressively smaller regions in order to converge to the
+specified accuracy, within the specified iteration limit. The lambda
+takes the lower and upper limits of the region as parameters."
   (composite f :integrator #'piecewise/2 :tolerance tolerance :limit limit))
 
 (defmacro piecewise+ ((x &key (tolerance +tolerance+) (limit +limit+)) f)
+  "Create a lambda that integrates a region over `F`.
+using piecewise composite algorithms. The region will be subdivided
+into progressively smaller regions in order to converge to the
+specified accuracy, within the specified iteration limit. The lambda
+takes the lower and upper limits of the region as parameters."
   `(piecewise (lambda (,x) ,f) :tolerance ,tolerance :limit ,limit))
 

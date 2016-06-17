@@ -1,0 +1,919 @@
+<!doctype html>
+
+<html lang='en'>
+  <head>
+    <meta charset='UTF-8' />
+<title>GenDoc Documentation
+</title>
+<link rel='stylesheet' href='simple.css' />
+  </head>
+  <body>
+<article id='reference-numerical' class='apiref-article'>
+  <h1>Reference: NUMERICAL
+  </h1>
+<section id='numerical-macros' class='section-macros'>
+  <h2>Macros
+  </h2>
+<section id='apiref-cond_' class='section-apiref-item'>
+  <div class='apiref-spec'>COND_
+  </div>
+  <div class='apiref-lambda'>(&amp;REST CLAUSES)
+  </div>
+  <div class='apiref-doc'><p>Execute clauses based on whether or not functions converge, with <code>_</code> bound
+to the result and <code>@</code> bound to the number of attempts.</p>
+
+  </div>
+</section>
+<section id='apiref-if_' class='section-apiref-item'>
+  <div class='apiref-spec'>IF_
+  </div>
+  <div class='apiref-lambda'>(IF THEN
+    &amp;OPTIONAL
+    ELSE)
+  </div>
+  <div class='apiref-doc'><p>make a decision based on whether or not <code>IF</code> converged and execute <code>THEN</code> or <code>ELSE</code>
+accordingly, with <code>_</code> bound to the result and <code>@</code> bound to the number of attempts.</p>
+
+  </div>
+</section>
+<section id='apiref-when_' class='section-apiref-item'>
+  <div class='apiref-spec'>WHEN_
+  </div>
+  <div class='apiref-lambda'>(IF THEN)
+  </div>
+  <div class='apiref-doc'><p>Execute <code>THEN</code> if <code>IF</code> converges, with <code>_</code> bound to the result and <code>@</code>
+bound to the number of attempts.</p>
+
+  </div>
+</section>
+</section>
+</article>
+<article id='reference-numerical.integration' class='apiref-article'>
+  <h1>Reference: NUMERICAL.INTEGRATION
+  </h1>
+<section id='numerical.integration-functions' class='section-functions'>
+  <h2>Functions
+  </h2>
+<section id='apiref-composite' class='section-apiref-item'>
+  <div class='apiref-spec'>COMPOSITE
+  </div>
+  <div class='apiref-lambda'>(F &amp;KEY (INTEGRATOR #&#039;GAUSS-LEGENDRE/4) (TOLERANCE +TOLERANCE+) (LIMIT +LIMIT+))
+  </div>
+  <div class='apiref-doc'><p>Create a lambda that integrates a region over <code>F</code>.
+<code>INTEGRATOR</code> specifies the algorithm to use. The region will be
+subdivided into progressively smaller regions in order to converge to
+the specified accuracy, within the specified iteration limit. The
+lambda takes the lower and upper limits of the region as parameters.</p>
+
+  </div>
+</section>
+<section id='apiref-composite/n' class='section-apiref-item'>
+  <div class='apiref-spec'>COMPOSITE/N
+  </div>
+  <div class='apiref-lambda'>(F &amp;KEY (N 1) (INTEGRATOR #&#039;GAUSS-LEGENDRE/4))
+  </div>
+  <div class='apiref-doc'><p>Create a lambda that integrates a region over <code>F</code>. The region will
+be divided into <code>N</code> segments, and <code>INTEGRATOR</code> will be used to
+integrate each segment. The lambda takes the lower and upper limits of
+the region as parameters.</p>
+
+  </div>
+</section>
+<section id='apiref-euler-mcclaurin' class='section-apiref-item'>
+  <div class='apiref-spec'>EULER-MCCLAURIN
+  </div>
+  <div class='apiref-lambda'>(F &amp;OPTIONAL DF DF3)
+  </div>
+  <div class='apiref-doc'><p>Create a lambda that integrates a region over <code>F</code>, where <code>DF</code> is
+the first derivative function of <code>F</code> and <code>DF3</code> is the third derivative
+function of <code>F</code>. <code>DF</code> and <code>DF3</code> are both optional; if neither is
+specified, the behavior is identical to piecewise/2. Otherwise the
+derivative functions are used with the Euler-McClaurin integration
+rule to improve accuracy. The lambda takes the lower and upper limits
+of the region as parameters, and optionally the number of segments to
+divide the region into..</p>
+
+  </div>
+</section>
+<section id='apiref-gauss-laguerre/2' class='section-apiref-item'>
+  <div class='apiref-spec'>GAUSS-LAGUERRE/2
+  </div>
+  <div class='apiref-lambda'>(F)
+  </div>
+  <div class='apiref-doc'><p>Create a lambda that integrates the region from 0 to infinity over <code>F</code> using a Laguerre polynomial of order 2.</p>
+
+  </div>
+</section>
+<section id='apiref-gauss-laguerre/4' class='section-apiref-item'>
+  <div class='apiref-spec'>GAUSS-LAGUERRE/4
+  </div>
+  <div class='apiref-lambda'>(F)
+  </div>
+  <div class='apiref-doc'><p>Create a lambda that integrates the region from 0 to infinity over <code>F</code> using a Laguerre polynomial of order 4.</p>
+
+  </div>
+</section>
+<section id='apiref-gauss-laguerre/6' class='section-apiref-item'>
+  <div class='apiref-spec'>GAUSS-LAGUERRE/6
+  </div>
+  <div class='apiref-lambda'>(F)
+  </div>
+  <div class='apiref-doc'><p>Create a lambda that integrates the region from 0 to infinity over <code>F</code> using a Laguerre polynomial of order 6.</p>
+
+  </div>
+</section>
+<section id='apiref-gauss-laguerre/8' class='section-apiref-item'>
+  <div class='apiref-spec'>GAUSS-LAGUERRE/8
+  </div>
+  <div class='apiref-lambda'>(F)
+  </div>
+  <div class='apiref-doc'><p>Create a lambda that integrates the region from 0 to infinity over <code>F</code> using a Laguerre polynomial of order 8.</p>
+
+  </div>
+</section>
+<section id='apiref-gauss-legendre/2' class='section-apiref-item'>
+  <div class='apiref-spec'>GAUSS-LEGENDRE/2
+  </div>
+  <div class='apiref-lambda'>(F)
+  </div>
+  <div class='apiref-doc'><p>Create a lambda that integrates a region over <code>F</code> using a Legendre polynomial
+of order 2. The lambda takes the lower and upper limits of the region as parameters.</p>
+
+  </div>
+</section>
+<section id='apiref-gauss-legendre/3' class='section-apiref-item'>
+  <div class='apiref-spec'>GAUSS-LEGENDRE/3
+  </div>
+  <div class='apiref-lambda'>(F)
+  </div>
+  <div class='apiref-doc'><p>Create a lambda that integrates a region over <code>F</code> using a Legendre polynomial
+of order 3. The lambda takes the lower and upper limits of the region as parameters.</p>
+
+  </div>
+</section>
+<section id='apiref-gauss-legendre/4' class='section-apiref-item'>
+  <div class='apiref-spec'>GAUSS-LEGENDRE/4
+  </div>
+  <div class='apiref-lambda'>(F)
+  </div>
+  <div class='apiref-doc'><p>Create a lambda that integrates a region over <code>F</code> using a Legendre polynomial
+of order 4. The lambda takes the lower and upper limits of the region as parameters.</p>
+
+  </div>
+</section>
+<section id='apiref-gauss-legendre/5' class='section-apiref-item'>
+  <div class='apiref-spec'>GAUSS-LEGENDRE/5
+  </div>
+  <div class='apiref-lambda'>(F)
+  </div>
+  <div class='apiref-doc'><p>Create a lambda that integrates a region over <code>F</code> using a Legendre polynomial
+of order 5. The lambda takes the lower and upper limits of the region as parameters.</p>
+
+  </div>
+</section>
+<section id='apiref-gauss-legendre/6' class='section-apiref-item'>
+  <div class='apiref-spec'>GAUSS-LEGENDRE/6
+  </div>
+  <div class='apiref-lambda'>(F)
+  </div>
+  <div class='apiref-doc'><p>Create a lambda that integrates a region over <code>F</code> using a Legendre polynomial
+of order 6. The lambda takes the lower and upper limits of the region as parameters.</p>
+
+  </div>
+</section>
+<section id='apiref-gauss-legendre/7' class='section-apiref-item'>
+  <div class='apiref-spec'>GAUSS-LEGENDRE/7
+  </div>
+  <div class='apiref-lambda'>(F)
+  </div>
+  <div class='apiref-doc'><p>Create a lambda that integrates a region over <code>F</code> using a Legendre polynomial
+of order 7. The lambda takes the lower and upper limits of the region as parameters.</p>
+
+  </div>
+</section>
+<section id='apiref-gauss-legendre/8' class='section-apiref-item'>
+  <div class='apiref-spec'>GAUSS-LEGENDRE/8
+  </div>
+  <div class='apiref-lambda'>(F)
+  </div>
+  <div class='apiref-doc'><p>Create a lambda that integrates a region over <code>F</code> using a Legendre polynomial
+of order 8. The lambda takes the lower and upper limits of the region as parameters.</p>
+
+  </div>
+</section>
+<section id='apiref-gauss-legendre/9' class='section-apiref-item'>
+  <div class='apiref-spec'>GAUSS-LEGENDRE/9
+  </div>
+  <div class='apiref-lambda'>(F)
+  </div>
+  <div class='apiref-doc'><p>Create a lambda that integrates a region over <code>F</code> using a Legendre polynomial
+of order 9. The lambda takes the lower and upper limits of the region as parameters.</p>
+
+  </div>
+</section>
+<section id='apiref-gaussian-quadrature/n' class='section-apiref-item'>
+  <div class='apiref-spec'>GAUSSIAN-QUADRATURE/N
+  </div>
+  <div class='apiref-lambda'>(F N)
+  </div>
+  <div class='apiref-doc'><p>Create a lambda that integrates a region over <code>F</code>. The lambda takes
+the lower and upper limits of the region as parameters. <code>N</code> specifies
+the order of the Legendre polynomial to use for the integration rule,
+which can range from 2 to 9.</p>
+
+  </div>
+</section>
+<section id='apiref-laguerre-quadrature/n' class='section-apiref-item'>
+  <div class='apiref-spec'>LAGUERRE-QUADRATURE/N
+  </div>
+  <div class='apiref-lambda'>(F N)
+  </div>
+  <div class='apiref-doc'><p>Create a lambda that integrates the region from 0 to infinity over <code>F</code>.
+<code>N</code> specifies the order of the Laguerre polynomial to use for the
+integration rule, which can be 2,4,6, or 8.</p>
+
+  </div>
+</section>
+<section id='apiref-piecewise' class='section-apiref-item'>
+  <div class='apiref-spec'>PIECEWISE
+  </div>
+  <div class='apiref-lambda'>(F &amp;KEY (TOLERANCE +TOLERANCE+) (LIMIT +LIMIT+))
+  </div>
+  <div class='apiref-doc'><p>Create a lambda that integrates a region over <code>F</code>.
+using piecewise composite algorithms. The region will be subdivided
+into progressively smaller regions in order to converge to the
+specified accuracy, within the specified iteration limit. The lambda
+takes the lower and upper limits of the region as parameters.</p>
+
+  </div>
+</section>
+<section id='apiref-piecewise/2' class='section-apiref-item'>
+  <div class='apiref-spec'>PIECEWISE/2
+  </div>
+  <div class='apiref-lambda'>(F)
+  </div>
+  <div class='apiref-doc'><p>Create a lambda that integrates a region over <code>F</code>. The lambda takes
+the lower and upper limits of the region as parameters, and optionally
+the number of segments to divide the region into. The algorithm used
+is piecewise linear approximation, i.e. the trapezoid rule.</p>
+
+  </div>
+</section>
+<section id='apiref-piecewise/3' class='section-apiref-item'>
+  <div class='apiref-spec'>PIECEWISE/3
+  </div>
+  <div class='apiref-lambda'>(F)
+  </div>
+  <div class='apiref-doc'><p>Create a lambda that integrates a region over <code>F</code>. The lambda takes
+the lower and upper limits of the region as parameters, and optionally
+the number of segments to divide the region into (which will be
+incremented to make even if necessary). The algorithm used is
+piecewise quadratic approximation, i.e. Simpson's 1/3 rule.</p>
+
+  </div>
+</section>
+<section id='apiref-piecewise/4' class='section-apiref-item'>
+  <div class='apiref-spec'>PIECEWISE/4
+  </div>
+  <div class='apiref-lambda'>(F)
+  </div>
+  <div class='apiref-doc'><p>Create a lambda that integrates a region over <code>F</code>. The lambda takes
+the lower and upper limits of the region as parameters, and optionally
+the number of segments to divide the region into (which will be
+incremented to make divisible by 3 if necessary). The algorithm used is
+piecewise cubic approximation, i.e. Simpson's 3/8 rule.</p>
+
+  </div>
+</section>
+<section id='apiref-piecewise/5' class='section-apiref-item'>
+  <div class='apiref-spec'>PIECEWISE/5
+  </div>
+  <div class='apiref-lambda'>(F)
+  </div>
+  <div class='apiref-doc'><p>Create a lambda that integrates a region over <code>F</code>. The lambda takes
+the lower and upper limits of the region as parameters, and optionally
+the number of segments to divide the region into (which will be
+incremented to make divisible by 4 if necessary). The algorithm used is
+piecewise quartic approximation, i.e. Boole's (or Bode's) rule.</p>
+
+  </div>
+</section>
+<section id='apiref-romberg' class='section-apiref-item'>
+  <div class='apiref-spec'>ROMBERG
+  </div>
+  <div class='apiref-lambda'>(F &amp;KEY (INTEGRATOR #&#039;PIECEWISE/2) RATIO-LIMIT (TOLERANCE +TOLERANCE+)
+ (LIMIT +LIMIT+))
+  </div>
+  <div class='apiref-doc'><p>Create a lambda that attempts to integrate a region over <code>F</code> to the
+specified accuracy, within the specified limit of iteration, by
+applying richardson extrapolation to the specified integrator. If
+<code>RATIO-LIMIT</code> is specified, it is the amount of deviation allowed to
+the ratio of error reduction between consecutive steps, which should
+normally be around 4; the deviation allowed should be around 0.4, or
+leave NIL to disable this feature.</p>
+
+  </div>
+</section>
+</section>
+<section id='numerical.integration-macros' class='section-macros'>
+  <h2>Macros
+  </h2>
+<section id='apiref-composite+' class='section-apiref-item'>
+  <div class='apiref-spec'>COMPOSITE+
+  </div>
+  <div class='apiref-lambda'>((X &amp;KEY (INTEGRATOR #&#039;GAUSS-LEGENDRE/4) (TOLERANCE +TOLERANCE+)
+  (LIMIT +LIMIT+))
+ F)
+  </div>
+  <div class='apiref-doc'><p>Create a lambda that integrates a region over <code>F</code>.
+<code>INTEGRATOR</code> specifies the algorithm to use. The region will be
+subdivided into progressively smaller regions in order to converge to
+the specified accuracy, within the specified iteration limit. The
+lambda takes the lower and upper limits of the region as parameters.</p>
+
+  </div>
+</section>
+<section id='apiref-composite/n+' class='section-apiref-item'>
+  <div class='apiref-spec'>COMPOSITE/N+
+  </div>
+  <div class='apiref-lambda'>((X &amp;KEY (N 1) (INTEGRATOR #&#039;GAUSS-LEGENDRE/4)) F)
+  </div>
+  <div class='apiref-doc'><p>Create a lambda that integrates a region over <code>F</code>. The region will
+be divided into <code>N</code> segments, and <code>INTEGRATOR</code> will be used to
+integrate each segment. The lambda takes the lower and upper limits of
+the region as parameters.</p>
+
+  </div>
+</section>
+<section id='apiref-euler-mcclaurin+' class='section-apiref-item'>
+  <div class='apiref-spec'>EULER-MCCLAURIN+
+  </div>
+  <div class='apiref-lambda'>((X) F &amp;OPTIONAL DF DF3)
+  </div>
+  <div class='apiref-doc'><p>Create a lambda that integrates a region over <code>F</code>, where <code>DF</code> is
+the first derivative function of <code>F</code> and <code>DF3</code> is the third derivative
+function of <code>F</code>. <code>DF</code> and <code>DF3</code> are both optional; if neither is
+specified, the behavior is identical to piecewise/2. Otherwise the
+derivative functions are used with the Euler-McClaurin integration
+rule to improve accuracy. The lambda takes the lower and upper limits
+of the region as parameters, and optionally the number of segments to
+divide the region into..</p>
+
+  </div>
+</section>
+<section id='apiref-gauss-laguerre/2+' class='section-apiref-item'>
+  <div class='apiref-spec'>GAUSS-LAGUERRE/2+
+  </div>
+  <div class='apiref-lambda'>((X) F)
+  </div>
+  <div class='apiref-doc'><p>Create a lambda that integrates the region from 0 to infinity over <code>F</code> using a Laguerre polynomial of order 2.</p>
+
+  </div>
+</section>
+<section id='apiref-gauss-laguerre/4+' class='section-apiref-item'>
+  <div class='apiref-spec'>GAUSS-LAGUERRE/4+
+  </div>
+  <div class='apiref-lambda'>((X) F)
+  </div>
+  <div class='apiref-doc'><p>Create a lambda that integrates the region from 0 to infinity over <code>F</code> using a Laguerre polynomial of order 4.</p>
+
+  </div>
+</section>
+<section id='apiref-gauss-laguerre/6+' class='section-apiref-item'>
+  <div class='apiref-spec'>GAUSS-LAGUERRE/6+
+  </div>
+  <div class='apiref-lambda'>((X) F)
+  </div>
+  <div class='apiref-doc'><p>Create a lambda that integrates the region from 0 to infinity over <code>F</code> using a Laguerre polynomial of order 6.</p>
+
+  </div>
+</section>
+<section id='apiref-gauss-laguerre/8+' class='section-apiref-item'>
+  <div class='apiref-spec'>GAUSS-LAGUERRE/8+
+  </div>
+  <div class='apiref-lambda'>((X) F)
+  </div>
+  <div class='apiref-doc'><p>Create a lambda that integrates the region from 0 to infinity over <code>F</code> using a Laguerre polynomial of order 8.</p>
+
+  </div>
+</section>
+<section id='apiref-gauss-legendre/2+' class='section-apiref-item'>
+  <div class='apiref-spec'>GAUSS-LEGENDRE/2+
+  </div>
+  <div class='apiref-lambda'>((X) F)
+  </div>
+  <div class='apiref-doc'><p>Create a lambda that integrates a region over <code>F</code> using a Legendre polynomial
+of order 2. The lambda takes the lower and upper limits of the region as parameters.</p>
+
+  </div>
+</section>
+<section id='apiref-gauss-legendre/3+' class='section-apiref-item'>
+  <div class='apiref-spec'>GAUSS-LEGENDRE/3+
+  </div>
+  <div class='apiref-lambda'>((X) F)
+  </div>
+  <div class='apiref-doc'><p>Create a lambda that integrates a region over <code>F</code> using a Legendre polynomial
+of order 3. The lambda takes the lower and upper limits of the region as parameters.</p>
+
+  </div>
+</section>
+<section id='apiref-gauss-legendre/4+' class='section-apiref-item'>
+  <div class='apiref-spec'>GAUSS-LEGENDRE/4+
+  </div>
+  <div class='apiref-lambda'>((X) F)
+  </div>
+  <div class='apiref-doc'><p>Create a lambda that integrates a region over <code>F</code> using a Legendre polynomial
+of order 4. The lambda takes the lower and upper limits of the region as parameters.</p>
+
+  </div>
+</section>
+<section id='apiref-gauss-legendre/5+' class='section-apiref-item'>
+  <div class='apiref-spec'>GAUSS-LEGENDRE/5+
+  </div>
+  <div class='apiref-lambda'>((X) F)
+  </div>
+  <div class='apiref-doc'><p>Create a lambda that integrates a region over <code>F</code> using a Legendre polynomial
+of order 5. The lambda takes the lower and upper limits of the region as parameters.</p>
+
+  </div>
+</section>
+<section id='apiref-gauss-legendre/6+' class='section-apiref-item'>
+  <div class='apiref-spec'>GAUSS-LEGENDRE/6+
+  </div>
+  <div class='apiref-lambda'>((X) F)
+  </div>
+  <div class='apiref-doc'><p>Create a lambda that integrates a region over <code>F</code> using a Legendre polynomial
+of order 6. The lambda takes the lower and upper limits of the region as parameters.</p>
+
+  </div>
+</section>
+<section id='apiref-gauss-legendre/7+' class='section-apiref-item'>
+  <div class='apiref-spec'>GAUSS-LEGENDRE/7+
+  </div>
+  <div class='apiref-lambda'>((X) F)
+  </div>
+  <div class='apiref-doc'><p>Create a lambda that integrates a region over <code>F</code> using a Legendre polynomial
+of order 7. The lambda takes the lower and upper limits of the region as parameters.</p>
+
+  </div>
+</section>
+<section id='apiref-gauss-legendre/8+' class='section-apiref-item'>
+  <div class='apiref-spec'>GAUSS-LEGENDRE/8+
+  </div>
+  <div class='apiref-lambda'>((X) F)
+  </div>
+  <div class='apiref-doc'><p>Create a lambda that integrates a region over <code>F</code> using a Legendre polynomial
+of order 8. The lambda takes the lower and upper limits of the region as parameters.</p>
+
+  </div>
+</section>
+<section id='apiref-gauss-legendre/9+' class='section-apiref-item'>
+  <div class='apiref-spec'>GAUSS-LEGENDRE/9+
+  </div>
+  <div class='apiref-lambda'>((X) F)
+  </div>
+  <div class='apiref-doc'><p>Create a lambda that integrates a region over <code>F</code> using a Legendre polynomial
+of order 9. The lambda takes the lower and upper limits of the region as parameters.</p>
+
+  </div>
+</section>
+<section id='apiref-gaussian-quadrature/n+' class='section-apiref-item'>
+  <div class='apiref-spec'>GAUSSIAN-QUADRATURE/N+
+  </div>
+  <div class='apiref-lambda'>((X N) F)
+  </div>
+  <div class='apiref-doc'><p>Create a lambda that integrates a region over <code>F</code>. The lambda takes
+the lower and upper limits of the region as parameters. <code>N</code> specifies
+the order of the Legendre polynomial to use for the integration rule,
+which can range from 2 to 9.</p>
+
+  </div>
+</section>
+<section id='apiref-laguerre-quadrature/n+' class='section-apiref-item'>
+  <div class='apiref-spec'>LAGUERRE-QUADRATURE/N+
+  </div>
+  <div class='apiref-lambda'>((X N) F)
+  </div>
+  <div class='apiref-doc'><p>Create a lambda that integrates the region from 0 to infinity over <code>F</code>.
+<code>N</code> specifies the order of the Laguerre polynomial to use for the
+integration rule, which can be 2,4,6, or 8.</p>
+
+  </div>
+</section>
+<section id='apiref-piecewise+' class='section-apiref-item'>
+  <div class='apiref-spec'>PIECEWISE+
+  </div>
+  <div class='apiref-lambda'>((X &amp;KEY (TOLERANCE +TOLERANCE+) (LIMIT +LIMIT+)) F)
+  </div>
+  <div class='apiref-doc'><p>Create a lambda that integrates a region over <code>F</code>.
+using piecewise composite algorithms. The region will be subdivided
+into progressively smaller regions in order to converge to the
+specified accuracy, within the specified iteration limit. The lambda
+takes the lower and upper limits of the region as parameters.</p>
+
+  </div>
+</section>
+<section id='apiref-piecewise/2+' class='section-apiref-item'>
+  <div class='apiref-spec'>PIECEWISE/2+
+  </div>
+  <div class='apiref-lambda'>((X) F)
+  </div>
+  <div class='apiref-doc'><p>Create a lambda that integrates a region over <code>F</code>. The lambda takes
+the lower and upper limits of the region as parameters, and optionally
+the number of segments to divide the region into. The algorithm used
+is piecewise linear approximation, i.e. the trapezoid rule.</p>
+
+  </div>
+</section>
+<section id='apiref-piecewise/3+' class='section-apiref-item'>
+  <div class='apiref-spec'>PIECEWISE/3+
+  </div>
+  <div class='apiref-lambda'>((X) F)
+  </div>
+  <div class='apiref-doc'><p>Create a lambda that integrates a region over <code>F</code>. The lambda takes
+the lower and upper limits of the region as parameters, and optionally
+the number of segments to divide the region into (which will be
+incremented to make even if necessary). The algorithm used is
+piecewise quadratic approximation, i.e. Simpson's 1/3 rule.</p>
+
+  </div>
+</section>
+<section id='apiref-piecewise/4+' class='section-apiref-item'>
+  <div class='apiref-spec'>PIECEWISE/4+
+  </div>
+  <div class='apiref-lambda'>((X) F)
+  </div>
+  <div class='apiref-doc'><p>Create a lambda that integrates a region over <code>F</code>. The lambda takes
+the lower and upper limits of the region as parameters, and optionally
+the number of segments to divide the region into (which will be
+incremented to make divisible by 3 if necessary). The algorithm used is
+piecewise cubic approximation, i.e. Simpson's 3/8 rule.</p>
+
+  </div>
+</section>
+<section id='apiref-piecewise/5+' class='section-apiref-item'>
+  <div class='apiref-spec'>PIECEWISE/5+
+  </div>
+  <div class='apiref-lambda'>((X) F)
+  </div>
+  <div class='apiref-doc'><p>Create a lambda that integrates a region over <code>F</code>. The lambda takes
+the lower and upper limits of the region as parameters, and optionally
+the number of segments to divide the region into (which will be
+incremented to make divisible by 4 if necessary). The algorithm used is
+piecewise quartic approximation, i.e. Boole's (or Bode's) rule.</p>
+
+  </div>
+</section>
+<section id='apiref-romberg+' class='section-apiref-item'>
+  <div class='apiref-spec'>ROMBERG+
+  </div>
+  <div class='apiref-lambda'>((X &amp;KEY (INTEGRATOR #&#039;PIECEWISE/2) RATIO-LIMIT (TOLERANCE +TOLERANCE+)
+  (LIMIT +LIMIT+))
+ F)
+  </div>
+  <div class='apiref-doc'><p>Create a lambda that attempts to integrate a region over <code>F</code> to the
+specified accuracy, within the specified limit of iteration, by
+applying richardson extrapolation to the specified integrator. If
+<code>RATIO-LIMIT</code> is specified, it is the amount of deviation allowed to
+the ratio of error reduction between consecutive steps, which should
+normally be around 4; the deviation allowed should be around 0.4, or
+leave NIL to disable this feature.</p>
+
+  </div>
+</section>
+</section>
+</article>
+<article id='reference-numerical.roots' class='apiref-article'>
+  <h1>Reference: NUMERICAL.ROOTS
+  </h1>
+<section id='numerical.roots-functions' class='section-functions'>
+  <h2>Functions
+  </h2>
+<section id='apiref-bisect' class='section-apiref-item'>
+  <div class='apiref-spec'>BISECT
+  </div>
+  <div class='apiref-lambda'>(F &amp;KEY (TOLERANCE +TOLERANCE+) (LIMIT +LIMIT+))
+  </div>
+  <div class='apiref-doc'><p>Create a lambda for attempting to find a root of <code>F</code> between two
+values, to a specified accuracy and within a specified number of
+iteration attempts. The lambda will use a brute-force bisection
+algorithm.</p>
+
+  </div>
+</section>
+<section id='apiref-false-position' class='section-apiref-item'>
+  <div class='apiref-spec'>FALSE-POSITION
+  </div>
+  <div class='apiref-lambda'>(F &amp;KEY (TOLERANCE +TOLERANCE+) (LIMIT +LIMIT+))
+  </div>
+  <div class='apiref-doc'><p>Create a lambda for attempting to find a root of <code>F</code> between two
+values, to a specified accuracy and within a specified number of
+iteration attempts. The lambda will use the method of false position
+to converge on the solution.</p>
+
+  </div>
+</section>
+<section id='apiref-newton-raphson' class='section-apiref-item'>
+  <div class='apiref-spec'>NEWTON-RAPHSON
+  </div>
+  <div class='apiref-lambda'>(F DF &amp;KEY (TOLERANCE +TOLERANCE+) (LIMIT +LIMIT+))
+  </div>
+  <div class='apiref-doc'><p>Create a lambda for finding a root of <code>F</code> between two values, to a
+specified accuracy and within a specified number of iteration
+attempts. The lambda will use the newton-raphson algorithm, which
+requires the derivative of the function to also be be provided, to
+quickly converge on the solution.</p>
+
+  </div>
+</section>
+<section id='apiref-nr/bisect' class='section-apiref-item'>
+  <div class='apiref-spec'>NR/BISECT
+  </div>
+  <div class='apiref-lambda'>(F DF &amp;KEY (TOLERANCE +TOLERANCE+) (LIMIT +LIMIT+))
+  </div>
+  <div class='apiref-doc'><p>Create a lambda for finding a root of <code>F</code> between two values, to a
+specified accuracy and within a specified number of iteration
+attempts. The lambda will use a hybrid algorithm that decides on each
+iteration whether to take a newton-raphson step or a bisection step.</p>
+
+  </div>
+</section>
+<section id='apiref-quadratic/bisect' class='section-apiref-item'>
+  <div class='apiref-spec'>QUADRATIC/BISECT
+  </div>
+  <div class='apiref-lambda'>(F &amp;KEY (TOLERANCE +TOLERANCE+) (LIMIT +LIMIT+))
+  </div>
+  <div class='apiref-doc'><p>Create a lambda for attempting to find a root of <code>F</code> between two
+values, to a specified accuracy and within a specified number of
+iteration attempts. The lambda will use a quadratic approximation
+method to converge on the solution, but reverts to the bisection
+method if unable to converge.</p>
+
+  </div>
+</section>
+<section id='apiref-root-brackets' class='section-apiref-item'>
+  <div class='apiref-spec'>ROOT-BRACKETS
+  </div>
+  <div class='apiref-lambda'>(F &amp;KEY (STEPS 100))
+  </div>
+  <div class='apiref-doc'><p>Create a lambda that will search for pairs of values that bracket
+the roots of <code>F</code>. <code>STEPS</code> determines the number of intervals that will
+be sampled. A list of value pairs will be returned.</p>
+
+  </div>
+</section>
+<section id='apiref-secant/bisect' class='section-apiref-item'>
+  <div class='apiref-spec'>SECANT/BISECT
+  </div>
+  <div class='apiref-lambda'>(F &amp;KEY (TOLERANCE +TOLERANCE+) (LIMIT +LIMIT+))
+  </div>
+  <div class='apiref-doc'><p>Create a lambda for attempting to find a root of <code>F</code> between two
+values, to a specified accuracy and within a specified number of
+iteration attempts. The lambda will use the Secant method to converge
+on the solution, but reverts to the bisection method if unable to
+converge.</p>
+
+  </div>
+</section>
+</section>
+<section id='numerical.roots-macros' class='section-macros'>
+  <h2>Macros
+  </h2>
+<section id='apiref-bisect+' class='section-apiref-item'>
+  <div class='apiref-spec'>BISECT+
+  </div>
+  <div class='apiref-lambda'>((X &amp;KEY (TOLERANCE +TOLERANCE+) (LIMIT +LIMIT+)) F)
+  </div>
+  <div class='apiref-doc'><p>Create a lambda for finding a root of <code>F</code> between two values, to a
+specified accuracy and within a specified number of iteration
+attempts. The lambda will use a brute-force bisection algorithm.</p>
+
+  </div>
+</section>
+<section id='apiref-false-position+' class='section-apiref-item'>
+  <div class='apiref-spec'>FALSE-POSITION+
+  </div>
+  <div class='apiref-lambda'>((X &amp;KEY (TOLERANCE +TOLERANCE+) (LIMIT +LIMIT+)) F)
+  </div>
+  <div class='apiref-doc'><p>Create a lambda for attempting to find a root of <code>F</code> between two
+values, to a specified accuracy and within a specified number of
+iteration attempts. The lambda will use the method of false position
+to converge on the solution.</p>
+
+  </div>
+</section>
+<section id='apiref-newton-raphson+' class='section-apiref-item'>
+  <div class='apiref-spec'>NEWTON-RAPHSON+
+  </div>
+  <div class='apiref-lambda'>((X &amp;KEY (TOLERANCE +TOLERANCE+) (LIMIT +LIMIT+)) F DF)
+  </div>
+  <div class='apiref-doc'><p>Create a lambda for finding a root of <code>F</code> between two values, to a
+specified accuracy and within a specified number of iteration
+attempts. The lambda will use the newton-raphson algorithm, which
+requires the derivative of the function to also be be provided, to
+quickly converge on the solution.</p>
+
+  </div>
+</section>
+<section id='apiref-nr/bisect+' class='section-apiref-item'>
+  <div class='apiref-spec'>NR/BISECT+
+  </div>
+  <div class='apiref-lambda'>((X &amp;KEY (TOLERANCE +TOLERANCE+) (LIMIT +LIMIT+)) F DF)
+  </div>
+  <div class='apiref-doc'><p><em>Undocumented!</em></p>
+
+  </div>
+</section>
+<section id='apiref-quadratic/bisect+' class='section-apiref-item'>
+  <div class='apiref-spec'>QUADRATIC/BISECT+
+  </div>
+  <div class='apiref-lambda'>((X &amp;KEY (TOLERANCE +TOLERANCE+) (LIMIT +LIMIT+)) &amp;REST REST)
+  </div>
+  <div class='apiref-doc'><p>Create a lambda for attempting to find a root of <code>F</code> between two
+values, to a specified accuracy and within a specified number of
+iteration attempts. The lambda will use a quadratic approximation
+method to converge on the solution, but reverts to the bisection
+method if unable to converge.</p>
+
+  </div>
+</section>
+<section id='apiref-root-brackets+' class='section-apiref-item'>
+  <div class='apiref-spec'>ROOT-BRACKETS+
+  </div>
+  <div class='apiref-lambda'>((X &amp;KEY (STEPS 100)) F)
+  </div>
+  <div class='apiref-doc'><p>Create a lambda that will search for pairs of values that bracket
+the roots of <code>F</code>. <code>STEPS</code> determines the number of intervals that will
+be sampled. A list of value pairs will be returned.</p>
+
+  </div>
+</section>
+<section id='apiref-secant/bisect+' class='section-apiref-item'>
+  <div class='apiref-spec'>SECANT/BISECT+
+  </div>
+  <div class='apiref-lambda'>((X &amp;KEY (TOLERANCE +TOLERANCE+) (LIMIT +LIMIT+)) F)
+  </div>
+  <div class='apiref-doc'><p>Create a lambda for attempting to find a root of <code>F</code> between two
+values, to a specified accuracy and within a specified number of
+iteration attempts. The lambda will use the Secant method to converge
+on the solution, but reverts to the bisection method if unable to
+converge.</p>
+
+  </div>
+</section>
+</section>
+</article>
+<article id='reference-numerical.interpolation' class='apiref-article'>
+  <h1>Reference: NUMERICAL.INTERPOLATION
+  </h1>
+<section id='numerical.interpolation-functions' class='section-functions'>
+  <h2>Functions
+  </h2>
+<section id='apiref-cubic-spline' class='section-apiref-item'>
+  <div class='apiref-spec'>CUBIC-SPLINE
+  </div>
+  <div class='apiref-lambda'>(X F &amp;OPTIONAL FP1 FPN)
+  </div>
+  <div class='apiref-doc'><p>Create a lambda to approximate f(xx) using a cubic spline through a
+list of values and their function evaluations. The derivates at the
+endpoints may optionally be provided, in which case a clamped cubic
+spline will be used. Otherwise a natural cubic spline will be used.</p>
+
+  </div>
+</section>
+<section id='apiref-cubic-spline-prime' class='section-apiref-item'>
+  <div class='apiref-spec'>CUBIC-SPLINE-PRIME
+  </div>
+  <div class='apiref-lambda'>(X F &amp;OPTIONAL FP1 FPN)
+  </div>
+  <div class='apiref-doc'><p>Create a lambda to approximate the derivative of f(xx) using a
+cubic spline through a list of values and their function
+evaluations. The derivates at the endpoints may optionally be
+provided, in which case a clamped cubic spline will be used. Otherwise
+a natural cubic spline will be used.</p>
+
+  </div>
+</section>
+<section id='apiref-first-derivative' class='section-apiref-item'>
+  <div class='apiref-spec'>FIRST-DERIVATIVE
+  </div>
+  <div class='apiref-lambda'>(F &amp;KEY (STEP +STEP+) (TOLERANCE +TOLERANCE+) (LIMIT +LIMIT+))
+  </div>
+  <div class='apiref-doc'><p>Create a lambda to approximate the first derivative of a function
+at any point. Richardson extrapolation will be used to converge on the
+solution down to a specified tolerance.</p>
+
+  </div>
+</section>
+<section id='apiref-first-derivative/2' class='section-apiref-item'>
+  <div class='apiref-spec'>FIRST-DERIVATIVE/2
+  </div>
+  <div class='apiref-lambda'>(F &amp;KEY (STEP +STEP+))
+  </div>
+  <div class='apiref-doc'><p>Create a lambda to approximate the first derivative of <code>F</code> at any point. <code>F</code> will be called
+2 times per approximation.</p>
+
+  </div>
+</section>
+<section id='apiref-first-derivative/4' class='section-apiref-item'>
+  <div class='apiref-spec'>FIRST-DERIVATIVE/4
+  </div>
+  <div class='apiref-lambda'>(F &amp;KEY (STEP +STEP+))
+  </div>
+  <div class='apiref-doc'><p>Create a lambda to approximate the first derivative of <code>F</code> at any point. <code>F</code> will be called
+4 times per approximation.</p>
+
+  </div>
+</section>
+<section id='apiref-hermite/cubic' class='section-apiref-item'>
+  <div class='apiref-spec'>HERMITE/CUBIC
+  </div>
+  <div class='apiref-lambda'>(LX LFX LDFX)
+  </div>
+  <div class='apiref-doc'><p>Create a lambda to approximate f(xx) using a Hermite cubic
+polynomial given a list of values, their function evaluations, and
+their function derivate evaluations.</p>
+
+  </div>
+</section>
+<section id='apiref-lagrange-polynomial' class='section-apiref-item'>
+  <div class='apiref-spec'>LAGRANGE-POLYNOMIAL
+  </div>
+  <div class='apiref-lambda'>(LX LFX)
+  </div>
+  <div class='apiref-doc'><p>Create a lambda to approximate f(xx) given a list of values and their function evaluations.</p>
+
+  </div>
+</section>
+<section id='apiref-lagrange/order' class='section-apiref-item'>
+  <div class='apiref-spec'>LAGRANGE/ORDER
+  </div>
+  <div class='apiref-lambda'>(LX LFX ORDER)
+  </div>
+  <div class='apiref-doc'><p>Create a lambda to approximate f(xx) given a list of values and their function evaluations.
+Only the evaluations associated with the nearest <code>ORDER</code> values will be used to construct
+the approximating polynomial.</p>
+
+  </div>
+</section>
+<section id='apiref-second-derivative' class='section-apiref-item'>
+  <div class='apiref-spec'>SECOND-DERIVATIVE
+  </div>
+  <div class='apiref-lambda'>(F &amp;KEY (STEP +STEP+) (TOLERANCE +TOLERANCE+) (LIMIT +LIMIT+))
+  </div>
+  <div class='apiref-doc'><p>Create a lambda to approximate the second derivative of a function
+at any point. Richardson extrapolation will be used to converge on the
+solution down to a specified tolerance.</p>
+
+  </div>
+</section>
+<section id='apiref-second-derivative/3' class='section-apiref-item'>
+  <div class='apiref-spec'>SECOND-DERIVATIVE/3
+  </div>
+  <div class='apiref-lambda'>(F &amp;KEY (STEP +STEP+))
+  </div>
+  <div class='apiref-doc'><p>Create a lambda to approximate the second derivative of <code>F</code> at any point. <code>F</code> will be called
+3 times per approximation.</p>
+
+  </div>
+</section>
+<section id='apiref-second-derivative/5' class='section-apiref-item'>
+  <div class='apiref-spec'>SECOND-DERIVATIVE/5
+  </div>
+  <div class='apiref-lambda'>(F &amp;KEY (STEP +STEP+))
+  </div>
+  <div class='apiref-doc'><p>Create a lambda to approximate the second derivative of <code>F</code> at any point. <code>F</code> will be called
+5 times per approximation.</p>
+
+  </div>
+</section>
+</section>
+<section id='numerical.interpolation-macros' class='section-macros'>
+  <h2>Macros
+  </h2>
+<section id='apiref-first-derivative+' class='section-apiref-item'>
+  <div class='apiref-spec'>FIRST-DERIVATIVE+
+  </div>
+  <div class='apiref-lambda'>((X &amp;KEY (STEP +STEP+) (TOLERANCE +TOLERANCE+) (LIMIT +LIMIT+)) F)
+  </div>
+  <div class='apiref-doc'><p>Create a lambda to approximate the first derivative of a function
+at any point. Richardson extrapolation will be used to converge on the
+solution down to a specified tolerance.</p>
+
+  </div>
+</section>
+<section id='apiref-second-derivative+' class='section-apiref-item'>
+  <div class='apiref-spec'>SECOND-DERIVATIVE+
+  </div>
+  <div class='apiref-lambda'>((X &amp;KEY (STEP +STEP+) (TOLERANCE +TOLERANCE+) (LIMIT +LIMIT+)) F)
+  </div>
+  <div class='apiref-doc'><p>Create a lambda to approximate the second derivative of a function
+at any point. Richardson extrapolation will be used to converge on the
+solution down to a specified tolerance.</p>
+
+  </div>
+</section>
+</section>
+</article>
+  </body>
+</html>

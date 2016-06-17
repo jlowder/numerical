@@ -92,7 +92,7 @@ their namesakes if used outside of this library:
 
 ## API Reference
 
-Coming soon.
+[API Reference](http://htmlpreview.github.com/?http://github.com/jlowder/numerical/blob/master/doc/ref.html)
 
 ## License
 
