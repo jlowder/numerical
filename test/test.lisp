@@ -325,12 +325,12 @@
       (~= exact (funcall gl+ 1 5)))))
 
 (define-test gauss-legendre/9
-  (labels ((f (x) (* 9 x x x x x x x x))
-           (exact (a b) (- (* b b b b b b b b b) (* a a a a a a a a a))))
+  (labels ((f (x) (* 8 x x x x x x x))
+           (exact (a b) (- (* b b b b b b b b) (* a a a a a a a a))))
     (let ((exact (exact 1 5))
           (gl (gauss-legendre/9 #'f))
           (gl+ (gauss-legendre/9+ (x)
-                                  (* 9 x x x x x x x x))))
+                                  (* 8 x x x x x x x))))
       (~= exact (funcall gl 1 5))
       (~= exact (funcall gl+ 1 5)))))
 
