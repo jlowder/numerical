@@ -5,7 +5,8 @@
         :lisp-unit 
         :numerical 
         :numerical.roots
-        :numerical.interpolation))
+        :numerical.interpolation
+        :numerical.integration))
 
 (in-package :numerical.test)
 
@@ -15,20 +16,30 @@
 (defun really-close (a b)
   (< (abs (- a b)) 5d-15))
 
-(defun ballpark (a b)
-  (assert-true (< (abs (- a b)) 5d-3)))
+(defmacro ballpark (a b)
+  `(if_ ,b
+       (assert-true (< (abs (- ,a _)) 5d-3))
+       (assert-equal ,a _)))
 
-(defun ~= (a b)
-  (assert-true (pretty-close a b)))
+(defmacro ~= (a b)
+  `(if_ ,b
+        (assert-true (pretty-close ,a _))
+        (assert-equal ,a _)))
 
-(defun == (a b)
-  (assert-true (really-close a b)))
+(defmacro == (a b)
+  `(if_ ,b
+        (assert-true (really-close ,a _))
+        (assert-equal ,a _)))
 
 (defun !~= (a b)
   (assert-false (pretty-close a b)))
 
 (defun !== (a b)
   (assert-false (really-close a b)))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; root finding tests
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (define-test bisect
   (let ((exact (/ pi 2)))
@@ -79,6 +90,10 @@
                                                (cos x)
                                                (* -1 (sin x)))
                        0 3))))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; interpolation tests
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (defun j (n)
   (nth n '((1.0d0 0.7651976866d0 0.2238907791d0 -0.2600519549d0
@@ -142,10 +157,13 @@
     (let ((exact (df 2d0))
           (d1 (first-derivative/2 #'f))
           (d2 (first-derivative/4 #'f))
-          (d3 (first-derivative #'f :tolerance 5d-15)))
+          (d3 (first-derivative #'f :tolerance 5d-15))
+          (d3+ (first-derivative+ (x :tolerance 5d-15)
+                                  (* x (exp x)))))
       (!~= exact (funcall d1 2))
       (ballpark exact (funcall d2 2))
       (~= exact (funcall d3 2))
+      (~= exact (funcall d3+ 2))
       )))
 
 (define-test second-derivatives
@@ -158,12 +176,164 @@
     (let ((exact (ddf 2d0))
           (d1 (second-derivative/3 #'f))
           (d2 (second-derivative/5 #'f))
-          (d3 (second-derivative #'f :step .4 :tolerance 5d-15)))
+          (d3 (second-derivative #'f :step .4 :tolerance 5d-15))
+          (d3+ (second-derivative+ (x :step .4 :tolerance 5d-15)
+                                   (* x (exp x)))))
       (!~= exact (funcall d1 2))
       (ballpark exact (funcall d2 2))
-      (ballpark exact (funcall d3 2))
+      (ballpark exact (funcall d3 2)) ;; todo figure out why not more precise
+      (ballpark exact (funcall d3+ 2)) ;; todo figure out why not more precise
       )))
-    
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; integration tests
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(define-test piecewise/2
+  ;; piecewise/2 should be exact for a straight line
+  (labels ((f (x) (* 2 x))
+           (exact (a b) (- (* b b) (* a a))))
+    (let ((exact (exact 1 5))
+          (p2 (piecewise/2 #'f))
+          (p2+ (piecewise/2+ (x) (* 2 x))))
+      (== exact (funcall p2 1 5))
+      (== exact (funcall p2+ 1 5)))))
+
+(define-test piecewise/3
+  ;; piecewise/3 should be exact for a quadratic line
+  (labels ((f (x) (* 3 x x))
+           (exact (a b) (- (* b b b) (* a a a))))
+    (let ((exact (exact 1 5))
+          (p3 (piecewise/3 #'f))
+          (p3+ (piecewise/3+ (x) (* 3 x x))))
+      (== exact (funcall p3 1 5))
+      (== exact (funcall p3+ 1 5)))))
+
+(define-test piecewise/4
+  ;; piecewise/4 should be exact for a cubic line
+  (labels ((f (x) (* 4 x x x))
+           (exact (a b) (- (* b b b b) (* a a a a))))
+    (let ((exact (exact 1 5))
+          (p4 (piecewise/4 #'f))
+          (p4+ (piecewise/4+ (x) (* 4 x x x))))
+      (== exact (funcall p4 1 5))
+      (== exact (funcall p4+ 1 5)))))
+
+(define-test piecewise/5
+  ;; piecewise/5 should be exact for a quartic line
+  (labels ((f (x) (* 5 x x x x))
+           (exact (a b) (- (* b b b b b) (* a a a a a))))
+    (let ((exact (exact 1 5))
+          (p5 (piecewise/5 #'f))
+          (p5+ (piecewise/5+ (x) (* 5 x x x x))))
+      (== exact (funcall p5 1 5))
+      (== exact (funcall p5+ 1 5)))))
+
+(define-test romberg
+  (labels ((f (x) (* 5 x x x x))
+           (exact (a b) (- (* b b b b b) (* a a a a a))))
+    (let ((exact (exact 1 5))
+          (r (romberg #'f))
+          (r+ (romberg+ (x)
+                        (* 5 x x x x))))
+      (== exact (funcall r 1 5))
+      (== exact (funcall r+ 1 5)))))
+
+(define-test euler-mcclaurin
+  (labels ((f (x) (* 5 x x x x))
+           (df (x) (* 20 x x x))
+           (df2 (x) (* 60 x x))
+           (df3 (x) (* 120 x))
+           (exact (a b) (- (* b b b b b) (* a a a a a))))
+    (let ((exact (exact 1 5))
+          (em (euler-mcclaurin #'f #'df #'df3))
+          (em+ (euler-mcclaurin+ (x)
+                                 (* 5 x x x x)
+                                 (* 20 x x x)
+                                 (* 120 x))))
+      (== exact (funcall em 1 5))
+      (== exact (funcall em+ 1 5)))))
+
+(define-test gauss-legendre/2
+  (labels ((f (x) (* 3 x x))
+           (exact (a b) (- (* b b b) (* a a a))))
+    (let ((exact (exact 1 5))
+          (gl (gauss-legendre/2 #'f))
+          (gl+ (gauss-legendre/2+ (x)
+                                   (* 3 x x))))
+      (~= exact (funcall gl 1 5))
+      (~= exact (funcall gl+ 1 5)))))
+
+(define-test gauss-legendre/3
+  (labels ((f (x) (* 4 x x x))
+           (exact (a b) (- (* b b b b) (* a a a a))))
+    (let ((exact (exact 1 5))
+          (gl (gauss-legendre/3 #'f))
+          (gl+ (gauss-legendre/3+ (x)
+                                  (* 4 x x x))))
+      (~= exact (funcall gl 1 5))
+      (~= exact (funcall gl+ 1 5)))))
+
+(define-test gauss-legendre/4
+  (labels ((f (x) (* 4 x x x))
+           (exact (a b) (- (* b b b b) (* a a a a))))
+    (let ((exact (exact 1 5))
+          (gl (gauss-legendre/4 #'f))
+          (gl+ (gauss-legendre/4+ (x)
+                                  (* 4 x x x))))
+      (~= exact (funcall gl 1 5))
+      (~= exact (funcall gl+ 1 5)))))
+
+(define-test gauss-legendre/5
+  (labels ((f (x) (* 5 x x x x))
+           (exact (a b) (- (* b b b b b) (* a a a a a))))
+    (let ((exact (exact 1 5))
+          (gl (gauss-legendre/5 #'f))
+          (gl+ (gauss-legendre/5+ (x)
+                                  (* 5 x x x x))))
+      (~= exact (funcall gl 1 5))
+      (~= exact (funcall gl+ 1 5)))))
+
+(define-test gauss-legendre/6
+  (labels ((f (x) (* 6 x x x x x))
+           (exact (a b) (- (* b b b b b b) (* a a a a a a))))
+    (let ((exact (exact 1 5))
+          (gl (gauss-legendre/6 #'f))
+          (gl+ (gauss-legendre/6+ (x)
+                                  (* 6 x x x x x))))
+      (~= exact (funcall gl 1 5))
+      (~= exact (funcall gl+ 1 5)))))
+
+(define-test gauss-legendre/7
+  (labels ((f (x) (* 7 x x x x x x))
+           (exact (a b) (- (* b b b b b b b) (* a a a a a a a))))
+    (let ((exact (exact 1 5))
+          (gl (gauss-legendre/7 #'f))
+          (gl+ (gauss-legendre/7+ (x)
+                                  (* 7 x x x x x x))))
+      (~= exact (funcall gl 1 5))
+      (~= exact (funcall gl+ 1 5)))))
+
+(define-test gauss-legendre/8
+  (labels ((f (x) (* 8 x x x x x x x))
+           (exact (a b) (- (* b b b b b b b b) (* a a a a a a a a))))
+    (let ((exact (exact 1 5))
+          (gl (gauss-legendre/8 #'f))
+          (gl+ (gauss-legendre/8+ (x)
+                                  (* 8 x x x x x x x))))
+      (~= exact (funcall gl 1 5))
+      (~= exact (funcall gl+ 1 5)))))
+
+(define-test gauss-legendre/9
+  (labels ((f (x) (* 9 x x x x x x x x))
+           (exact (a b) (- (* b b b b b b b b b) (* a a a a a a a a a))))
+    (let ((exact (exact 1 5))
+          (gl (gauss-legendre/9 #'f))
+          (gl+ (gauss-legendre/9+ (x)
+                                  (* 9 x x x x x x x x))))
+      (~= exact (funcall gl 1 5))
+      (~= exact (funcall gl+ 1 5)))))
+
 (let ((*print-errors* t)
       (*print-failures* t))
   (run-tests))
