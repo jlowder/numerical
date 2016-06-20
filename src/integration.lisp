@@ -201,7 +201,7 @@ specified, the behavior is identical to piecewise/2. Otherwise the
 derivative functions are used with the Euler-McClaurin integration
 rule to improve accuracy. The lambda takes the lower and upper limits
 of the region as parameters, and optionally the number of segments to
-divide the region into.."
+divide the region into."
   (lambda (l u &optional (n 1) (integrator (piecewise/2 f)))
     (let ((h (/ (- u l) n))
           (df (if df
@@ -220,7 +220,7 @@ specified, the behavior is identical to piecewise/2. Otherwise the
 derivative functions are used with the Euler-McClaurin integration
 rule to improve accuracy. The lambda takes the lower and upper limits
 of the region as parameters, and optionally the number of segments to
-divide the region into.."
+divide the region into."
   `(euler-mcclaurin (lambda (,x) ,f) ,(if df `(lambda (,x) ,df) `nil) ,(if df3 `(lambda (,x) ,df3) `nil)))
 
 (defun gaussian-quadrature/n (f n)
@@ -287,7 +287,7 @@ the region as parameters."
 be divided into `N` segments, and `INTEGRATOR` will be used to
 integrate each segment. The lambda takes the lower and upper limits of
 the region as parameters."
-  `(composite/n+ (lambda (,x) ,f) :n ,n :integrator ,integrator))
+  `(composite/n (lambda (,x) ,f) :n ,n :integrator ,integrator))
 
 (defun laguerre-quadrature/n (f n)
   "Create a lambda that integrates the region from 0 to infinity over `F`.
@@ -345,7 +345,7 @@ integration rule, which can be 2,4,6, or 8."
   (loop for i from 2 to 9 do (eval (defgaussian i)) (eval (defgaussian+ i)))
   (loop for i from 2 to 8 by 2 do (eval (deflaguerre i)) (eval (deflaguerre+ i))))
 
-(defun composite (f &key (integrator #'gauss-legendre/4) (tolerance +tolerance+) (limit +limit+))
+(defun composite (f &key (integrator #'gauss-legendre/4) (tolerance +tolerance+) (limit 9))
   "Create a lambda that integrates a region over `F`.
 `INTEGRATOR` specifies the algorithm to use. The region will be
 subdivided into progressively smaller regions in order to converge to
@@ -356,30 +356,13 @@ lambda takes the lower and upper limits of the region as parameters."
        as iny = (funcall (composite/n f :n x :integrator integrator) a b) then inx
        as inx = (funcall (composite/n f :n (1+ x) :integrator integrator) a b)
        as corr = (abs (/_ (- inx iny) inx))
-       do (when (> tol corr) (return (values inx t x)))
+       do (when (> tolerance corr) (return (values inx t x)))
        finally (return (values inx nil x)))))
 
-(defmacro composite+ ((x &key (integrator #'gauss-legendre/4) (tolerance +tolerance+) (limit +limit+)) f)
+(defmacro composite+ ((x &key (integrator #'gauss-legendre/4) (tolerance +tolerance+) (limit 9)) f)
   "Create a lambda that integrates a region over `F`.
 `INTEGRATOR` specifies the algorithm to use. The region will be
 subdivided into progressively smaller regions in order to converge to
 the specified accuracy, within the specified iteration limit. The
 lambda takes the lower and upper limits of the region as parameters."
   `(composite (lambda (,x) ,f) :integrator ,integrator :tolerance ,tolerance :limit ,limit))
-
-(defun piecewise (f &key (tolerance +tolerance+) (limit +limit+))
-  "Create a lambda that integrates a region over `F`.
-using piecewise composite algorithms. The region will be subdivided
-into progressively smaller regions in order to converge to the
-specified accuracy, within the specified iteration limit. The lambda
-takes the lower and upper limits of the region as parameters."
-  (composite f :integrator #'piecewise/2 :tolerance tolerance :limit limit))
-
-(defmacro piecewise+ ((x &key (tolerance +tolerance+) (limit +limit+)) f)
-  "Create a lambda that integrates a region over `F`.
-using piecewise composite algorithms. The region will be subdivided
-into progressively smaller regions in order to converge to the
-specified accuracy, within the specified iteration limit. The lambda
-takes the lower and upper limits of the region as parameters."
-  `(piecewise (lambda (,x) ,f) :tolerance ,tolerance :limit ,limit))
-
