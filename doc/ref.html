@@ -57,7 +57,7 @@ bound to the number of attempts.</p>
 <section id='apiref-composite' class='section-apiref-item'>
   <div class='apiref-spec'>COMPOSITE
   </div>
-  <div class='apiref-lambda'>(F &amp;KEY (INTEGRATOR #&#039;GAUSS-LEGENDRE/4) (TOLERANCE +TOLERANCE+) (LIMIT +LIMIT+))
+  <div class='apiref-lambda'>(F &amp;KEY (INTEGRATOR #&#039;GAUSS-LEGENDRE/4) (TOLERANCE +TOLERANCE+) (LIMIT 9))
   </div>
   <div class='apiref-doc'><p>Create a lambda that integrates a region over <code>F</code>.
 <code>INTEGRATOR</code> specifies the algorithm to use. The region will be
@@ -91,7 +91,7 @@ specified, the behavior is identical to piecewise/2. Otherwise the
 derivative functions are used with the Euler-McClaurin integration
 rule to improve accuracy. The lambda takes the lower and upper limits
 of the region as parameters, and optionally the number of segments to
-divide the region into..</p>
+divide the region into.</p>
 
   </div>
 </section>
@@ -234,19 +234,6 @@ integration rule, which can be 2,4,6, or 8.</p>
 
   </div>
 </section>
-<section id='apiref-piecewise' class='section-apiref-item'>
-  <div class='apiref-spec'>PIECEWISE
-  </div>
-  <div class='apiref-lambda'>(F &amp;KEY (TOLERANCE +TOLERANCE+) (LIMIT +LIMIT+))
-  </div>
-  <div class='apiref-doc'><p>Create a lambda that integrates a region over <code>F</code>.
-using piecewise composite algorithms. The region will be subdivided
-into progressively smaller regions in order to converge to the
-specified accuracy, within the specified iteration limit. The lambda
-takes the lower and upper limits of the region as parameters.</p>
-
-  </div>
-</section>
 <section id='apiref-piecewise/2' class='section-apiref-item'>
   <div class='apiref-spec'>PIECEWISE/2
   </div>
@@ -321,9 +308,7 @@ leave NIL to disable this feature.</p>
 <section id='apiref-composite+' class='section-apiref-item'>
   <div class='apiref-spec'>COMPOSITE+
   </div>
-  <div class='apiref-lambda'>((X &amp;KEY (INTEGRATOR #&#039;GAUSS-LEGENDRE/4) (TOLERANCE +TOLERANCE+)
-  (LIMIT +LIMIT+))
- F)
+  <div class='apiref-lambda'>((X &amp;KEY (INTEGRATOR #&#039;GAUSS-LEGENDRE/4) (TOLERANCE +TOLERANCE+) (LIMIT 9)) F)
   </div>
   <div class='apiref-doc'><p>Create a lambda that integrates a region over <code>F</code>.
 <code>INTEGRATOR</code> specifies the algorithm to use. The region will be
@@ -357,7 +342,7 @@ specified, the behavior is identical to piecewise/2. Otherwise the
 derivative functions are used with the Euler-McClaurin integration
 rule to improve accuracy. The lambda takes the lower and upper limits
 of the region as parameters, and optionally the number of segments to
-divide the region into..</p>
+divide the region into.</p>
 
   </div>
 </section>
@@ -497,19 +482,6 @@ which can range from 2 to 9.</p>
   <div class='apiref-doc'><p>Create a lambda that integrates the region from 0 to infinity over <code>F</code>.
 <code>N</code> specifies the order of the Laguerre polynomial to use for the
 integration rule, which can be 2,4,6, or 8.</p>
-
-  </div>
-</section>
-<section id='apiref-piecewise+' class='section-apiref-item'>
-  <div class='apiref-spec'>PIECEWISE+
-  </div>
-  <div class='apiref-lambda'>((X &amp;KEY (TOLERANCE +TOLERANCE+) (LIMIT +LIMIT+)) F)
-  </div>
-  <div class='apiref-doc'><p>Create a lambda that integrates a region over <code>F</code>.
-using piecewise composite algorithms. The region will be subdivided
-into progressively smaller regions in order to converge to the
-specified accuracy, within the specified iteration limit. The lambda
-takes the lower and upper limits of the region as parameters.</p>
 
   </div>
 </section>
