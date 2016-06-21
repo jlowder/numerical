@@ -45,7 +45,8 @@
            :gauss-legendre/n
            :gauss-legendre/n+
            :gauss-legendre
-           :gauss-legendre+))
+           :gauss-legendre+
+           :monte-carlo))
 
 (in-package :numerical.integration)
 
@@ -347,3 +348,7 @@ integration rule, which can be 2,4,6, or 8."
        `(laguerre-quadrature/n (lambda (,x) ,f) ,,n)))
   (loop for i from 2 to 9 do (eval (defgaussian i)) (eval (defgaussian+ i)))
   (loop for i from 2 to 8 by 2 do (eval (deflaguerre i)) (eval (deflaguerre+ i))))
+
+(defun monte-carlo (f &key (n 1000) (random (lambda () (random 1d0 (make-random-state t)))))
+  (lambda (a b)
+    (* (- b a) (/ 1 n) (loop repeat n summing (funcall f (funcall random))))))

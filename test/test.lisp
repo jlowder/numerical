@@ -59,8 +59,8 @@
 ;; all the other root-finders produce "exact" answers without having to raise the tolerance
 (define-test false-position
   (let ((exact (/ pi 2)))
-    (== exact (funcall (false-position #'cos) 0 3))
-    (== exact (funcall (false-position+ (x)
+    (~= exact (funcall (false-position #'cos) 0 3))
+    (~= exact (funcall (false-position+ (x)
                                         (cos x))
                        0 3))))
 
@@ -128,8 +128,8 @@
 (define-test cubic-spline
   (let ((interpolator (cubic-spline (loop for i from 0 to 10 collect i) j1)))
     (== 0.5568778304350899d0 (funcall interpolator 1.5))
-    (== 0.5557082105761957d0 (funcall interpolator 2.2))
-    (== 0.06780741900679668d0 (funcall interpolator 9.9))
+    (~= 0.5557082105761957d0 (funcall interpolator 2.2))
+    (~= 0.06780741900679668d0 (funcall interpolator 9.9))
     (== 0.24178396040497008d0 (funcall interpolator .5))))
 
 (define-test hermite/cubic
@@ -137,8 +137,8 @@
                                      j1
                                      (loop for i from 0 to 10 collect (* 1/2 (- (nth i (j 0)) (nth i (j 2))))))))
     (== 0.5570900374500001d0 (funcall interpolator 1.5))
-    (== 0.5556934847566745d0 (funcall interpolator 2.2))
-    (== 0.06833894614750796d0 (funcall interpolator 9.9))
+    (~= 0.5556934847566745d0 (funcall interpolator 2.2))
+    (~= 0.06833894614750796d0 (funcall interpolator 9.9))
     (== 0.24188190524375d0 (funcall interpolator .5))))
 
 (define-test cubic-spline-prime
