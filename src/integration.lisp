@@ -18,8 +18,6 @@
            :euler-mcclaurin+
            :romberg
            :romberg+
-           :gaussian-quadrature/n
-           :gaussian-quadrature/n+
            :gauss-laguerre/2
            :gauss-laguerre/2+
            :gauss-laguerre/4
@@ -44,14 +42,10 @@
            :gauss-legendre/8+
            :gauss-legendre/9
            :gauss-legendre/9+
-           :composite/n
-           :composite/n+
-           :composite
-           :composite+
-           :laguerre-quadrature/n
-           :laguerre-quadrature/n+
-           :piecewise
-           :piecewise+))
+           :gauss-legendre/n
+           :gauss-legendre/n+
+           :gauss-legendre
+           :gauss-legendre+))
 
 (in-package :numerical.integration)
 
@@ -262,14 +256,7 @@ which can range from 2 to 9."
                                    (0.081274388361574d0 0.180648160694857d0 0.260610696402935d0 0.312347077040003d0 0.33023935501260d0
                                     0.312347077040003d0 0.260610696402935d0 0.180648160694857d0 0.081274388361574d0)))))))
 
-(defmacro gaussian-quadrature/n+ ((x n) f)
-  "Create a lambda that integrates a region over `F`. The lambda takes
-the lower and upper limits of the region as parameters. `N` specifies
-the order of the Legendre polynomial to use for the integration rule,
-which can range from 2 to 9."
-  `(gaussian-quadrature/n (lambda (,x) ,f) ,n))
-
-(defun composite/n (f &key (n 1) (integrator #'gauss-legendre/4))
+(defun gauss-legendre/n (f &key (n 1) (integrator #'gauss-legendre/4))
   "Create a lambda that integrates a region over `F`. The region will
 be divided into `N` segments, and `INTEGRATOR` will be used to
 integrate each segment. The lambda takes the lower and upper limits of
@@ -282,12 +269,34 @@ the region as parameters."
            as u = (+ a h) then (+ u h)
            summing (funcall integrator l u))))))
 
-(defmacro composite/n+ ((x &key (n 1) (integrator #'gauss-legendre/4)) f)
+(defmacro gauss-legendre/n+ ((x &key (n 1) (integrator #'gauss-legendre/4)) f)
   "Create a lambda that integrates a region over `F`. The region will
 be divided into `N` segments, and `INTEGRATOR` will be used to
 integrate each segment. The lambda takes the lower and upper limits of
 the region as parameters."
-  `(composite/n (lambda (,x) ,f) :n ,n :integrator ,integrator))
+  `(gauss-legendre/n (lambda (,x) ,f) :n ,n :integrator ,integrator))
+
+(defun gauss-legendre (f &key (integrator #'gauss-legendre/4) (tolerance +tolerance+) (limit +limit+))
+  "Create a lambda that integrates a region over `F`.
+`INTEGRATOR` specifies the algorithm to use. The region will be
+subdivided into progressively smaller regions in order to converge to
+the specified accuracy, within the specified iteration limit. The
+lambda takes the lower and upper limits of the region as parameters."
+  (lambda (a b)
+    (loop for x from 2 to (1- limit)
+       as iny = (funcall (gauss-legendre/n f :n x :integrator integrator) a b) then inx
+       as inx = (funcall (gauss-legendre/n f :n (1+ x) :integrator integrator) a b)
+       as corr = (abs (/_ (- inx iny) inx))
+       do (when (> tolerance corr) (return (values inx t x)))
+       finally (return (values inx nil x)))))
+
+(defmacro gauss-legendre+ ((x &key (integrator #'gauss-legendre/4) (tolerance +tolerance+) (limit +limit+)) f)
+  "Create a lambda that integrates a region over `F`.
+`INTEGRATOR` specifies the algorithm to use. The region will be
+subdivided into progressively smaller regions in order to converge to
+the specified accuracy, within the specified iteration limit. The
+lambda takes the lower and upper limits of the region as parameters."
+  `(gauss-legendre (lambda (,x) ,f) :integrator ,integrator :tolerance ,tolerance :limit ,limit))
 
 (defun laguerre-quadrature/n (f n)
   "Create a lambda that integrates the region from 0 to infinity over `F`.
@@ -319,12 +328,6 @@ integration rule, which can be 2,4,6, or 8."
                                     .002794536235225673d0 .00009076508773358213d0
                                     .0000008485746716272532d0 .000000001048001174871510d0)))))))
 
-(defmacro laguerre-quadrature/n+ ((x n) f)
-  "Create a lambda that integrates the region from 0 to infinity over `F`.
-`N` specifies the order of the Laguerre polynomial to use for the
-integration rule, which can be 2,4,6, or 8."
-  `(laguerre-quadrature/n (lambda (,x) ,f) n))
-
 (eval-when (:execute :load-toplevel :compile-toplevel)
   (defun defgaussian (n)
     `(defun ,(intern (format nil "GAUSS-LEGENDRE/~A" n)) (f)
@@ -344,25 +347,3 @@ integration rule, which can be 2,4,6, or 8."
        `(laguerre-quadrature/n (lambda (,x) ,f) ,,n)))
   (loop for i from 2 to 9 do (eval (defgaussian i)) (eval (defgaussian+ i)))
   (loop for i from 2 to 8 by 2 do (eval (deflaguerre i)) (eval (deflaguerre+ i))))
-
-(defun composite (f &key (integrator #'gauss-legendre/4) (tolerance +tolerance+) (limit 9))
-  "Create a lambda that integrates a region over `F`.
-`INTEGRATOR` specifies the algorithm to use. The region will be
-subdivided into progressively smaller regions in order to converge to
-the specified accuracy, within the specified iteration limit. The
-lambda takes the lower and upper limits of the region as parameters."
-  (lambda (a b)
-    (loop for x from 2 to (1- limit)
-       as iny = (funcall (composite/n f :n x :integrator integrator) a b) then inx
-       as inx = (funcall (composite/n f :n (1+ x) :integrator integrator) a b)
-       as corr = (abs (/_ (- inx iny) inx))
-       do (when (> tolerance corr) (return (values inx t x)))
-       finally (return (values inx nil x)))))
-
-(defmacro composite+ ((x &key (integrator #'gauss-legendre/4) (tolerance +tolerance+) (limit 9)) f)
-  "Create a lambda that integrates a region over `F`.
-`INTEGRATOR` specifies the algorithm to use. The region will be
-subdivided into progressively smaller regions in order to converge to
-the specified accuracy, within the specified iteration limit. The
-lambda takes the lower and upper limits of the region as parameters."
-  `(composite (lambda (,x) ,f) :integrator ,integrator :tolerance ,tolerance :limit ,limit))

@@ -54,31 +54,6 @@ bound to the number of attempts.</p>
 <section id='numerical.integration-functions' class='section-functions'>
   <h2>Functions
   </h2>
-<section id='apiref-composite' class='section-apiref-item'>
-  <div class='apiref-spec'>COMPOSITE
-  </div>
-  <div class='apiref-lambda'>(F &amp;KEY (INTEGRATOR #&#039;GAUSS-LEGENDRE/4) (TOLERANCE +TOLERANCE+) (LIMIT 9))
-  </div>
-  <div class='apiref-doc'><p>Create a lambda that integrates a region over <code>F</code>.
-<code>INTEGRATOR</code> specifies the algorithm to use. The region will be
-subdivided into progressively smaller regions in order to converge to
-the specified accuracy, within the specified iteration limit. The
-lambda takes the lower and upper limits of the region as parameters.</p>
-
-  </div>
-</section>
-<section id='apiref-composite/n' class='section-apiref-item'>
-  <div class='apiref-spec'>COMPOSITE/N
-  </div>
-  <div class='apiref-lambda'>(F &amp;KEY (N 1) (INTEGRATOR #&#039;GAUSS-LEGENDRE/4))
-  </div>
-  <div class='apiref-doc'><p>Create a lambda that integrates a region over <code>F</code>. The region will
-be divided into <code>N</code> segments, and <code>INTEGRATOR</code> will be used to
-integrate each segment. The lambda takes the lower and upper limits of
-the region as parameters.</p>
-
-  </div>
-</section>
 <section id='apiref-euler-mcclaurin' class='section-apiref-item'>
   <div class='apiref-spec'>EULER-MCCLAURIN
   </div>
@@ -128,6 +103,19 @@ divide the region into.</p>
   <div class='apiref-lambda'>(F)
   </div>
   <div class='apiref-doc'><p>Create a lambda that integrates the region from 0 to infinity over <code>F</code> using a Laguerre polynomial of order 8.</p>
+
+  </div>
+</section>
+<section id='apiref-gauss-legendre' class='section-apiref-item'>
+  <div class='apiref-spec'>GAUSS-LEGENDRE
+  </div>
+  <div class='apiref-lambda'>(F &amp;KEY (INTEGRATOR #&#039;GAUSS-LEGENDRE/4) (TOLERANCE +TOLERANCE+) (LIMIT +LIMIT+))
+  </div>
+  <div class='apiref-doc'><p>Create a lambda that integrates a region over <code>F</code>.
+<code>INTEGRATOR</code> specifies the algorithm to use. The region will be
+subdivided into progressively smaller regions in order to converge to
+the specified accuracy, within the specified iteration limit. The
+lambda takes the lower and upper limits of the region as parameters.</p>
 
   </div>
 </section>
@@ -211,26 +199,15 @@ of order 9. The lambda takes the lower and upper limits of the region as paramet
 
   </div>
 </section>
-<section id='apiref-gaussian-quadrature/n' class='section-apiref-item'>
-  <div class='apiref-spec'>GAUSSIAN-QUADRATURE/N
+<section id='apiref-gauss-legendre/n' class='section-apiref-item'>
+  <div class='apiref-spec'>GAUSS-LEGENDRE/N
   </div>
-  <div class='apiref-lambda'>(F N)
+  <div class='apiref-lambda'>(F &amp;KEY (N 1) (INTEGRATOR #&#039;GAUSS-LEGENDRE/4))
   </div>
-  <div class='apiref-doc'><p>Create a lambda that integrates a region over <code>F</code>. The lambda takes
-the lower and upper limits of the region as parameters. <code>N</code> specifies
-the order of the Legendre polynomial to use for the integration rule,
-which can range from 2 to 9.</p>
-
-  </div>
-</section>
-<section id='apiref-laguerre-quadrature/n' class='section-apiref-item'>
-  <div class='apiref-spec'>LAGUERRE-QUADRATURE/N
-  </div>
-  <div class='apiref-lambda'>(F N)
-  </div>
-  <div class='apiref-doc'><p>Create a lambda that integrates the region from 0 to infinity over <code>F</code>.
-<code>N</code> specifies the order of the Laguerre polynomial to use for the
-integration rule, which can be 2,4,6, or 8.</p>
+  <div class='apiref-doc'><p>Create a lambda that integrates a region over <code>F</code>. The region will
+be divided into <code>N</code> segments, and <code>INTEGRATOR</code> will be used to
+integrate each segment. The lambda takes the lower and upper limits of
+the region as parameters.</p>
 
   </div>
 </section>
@@ -305,31 +282,6 @@ leave NIL to disable this feature.</p>
 <section id='numerical.integration-macros' class='section-macros'>
   <h2>Macros
   </h2>
-<section id='apiref-composite+' class='section-apiref-item'>
-  <div class='apiref-spec'>COMPOSITE+
-  </div>
-  <div class='apiref-lambda'>((X &amp;KEY (INTEGRATOR #&#039;GAUSS-LEGENDRE/4) (TOLERANCE +TOLERANCE+) (LIMIT 9)) F)
-  </div>
-  <div class='apiref-doc'><p>Create a lambda that integrates a region over <code>F</code>.
-<code>INTEGRATOR</code> specifies the algorithm to use. The region will be
-subdivided into progressively smaller regions in order to converge to
-the specified accuracy, within the specified iteration limit. The
-lambda takes the lower and upper limits of the region as parameters.</p>
-
-  </div>
-</section>
-<section id='apiref-composite/n+' class='section-apiref-item'>
-  <div class='apiref-spec'>COMPOSITE/N+
-  </div>
-  <div class='apiref-lambda'>((X &amp;KEY (N 1) (INTEGRATOR #&#039;GAUSS-LEGENDRE/4)) F)
-  </div>
-  <div class='apiref-doc'><p>Create a lambda that integrates a region over <code>F</code>. The region will
-be divided into <code>N</code> segments, and <code>INTEGRATOR</code> will be used to
-integrate each segment. The lambda takes the lower and upper limits of
-the region as parameters.</p>
-
-  </div>
-</section>
 <section id='apiref-euler-mcclaurin+' class='section-apiref-item'>
   <div class='apiref-spec'>EULER-MCCLAURIN+
   </div>
@@ -379,6 +331,21 @@ divide the region into.</p>
   <div class='apiref-lambda'>((X) F)
   </div>
   <div class='apiref-doc'><p>Create a lambda that integrates the region from 0 to infinity over <code>F</code> using a Laguerre polynomial of order 8.</p>
+
+  </div>
+</section>
+<section id='apiref-gauss-legendre+' class='section-apiref-item'>
+  <div class='apiref-spec'>GAUSS-LEGENDRE+
+  </div>
+  <div class='apiref-lambda'>((X &amp;KEY (INTEGRATOR #&#039;GAUSS-LEGENDRE/4) (TOLERANCE +TOLERANCE+)
+  (LIMIT +LIMIT+))
+ F)
+  </div>
+  <div class='apiref-doc'><p>Create a lambda that integrates a region over <code>F</code>.
+<code>INTEGRATOR</code> specifies the algorithm to use. The region will be
+subdivided into progressively smaller regions in order to converge to
+the specified accuracy, within the specified iteration limit. The
+lambda takes the lower and upper limits of the region as parameters.</p>
 
   </div>
 </section>
@@ -462,26 +429,15 @@ of order 9. The lambda takes the lower and upper limits of the region as paramet
 
   </div>
 </section>
-<section id='apiref-gaussian-quadrature/n+' class='section-apiref-item'>
-  <div class='apiref-spec'>GAUSSIAN-QUADRATURE/N+
+<section id='apiref-gauss-legendre/n+' class='section-apiref-item'>
+  <div class='apiref-spec'>GAUSS-LEGENDRE/N+
   </div>
-  <div class='apiref-lambda'>((X N) F)
+  <div class='apiref-lambda'>((X &amp;KEY (N 1) (INTEGRATOR #&#039;GAUSS-LEGENDRE/4)) F)
   </div>
-  <div class='apiref-doc'><p>Create a lambda that integrates a region over <code>F</code>. The lambda takes
-the lower and upper limits of the region as parameters. <code>N</code> specifies
-the order of the Legendre polynomial to use for the integration rule,
-which can range from 2 to 9.</p>
-
-  </div>
-</section>
-<section id='apiref-laguerre-quadrature/n+' class='section-apiref-item'>
-  <div class='apiref-spec'>LAGUERRE-QUADRATURE/N+
-  </div>
-  <div class='apiref-lambda'>((X N) F)
-  </div>
-  <div class='apiref-doc'><p>Create a lambda that integrates the region from 0 to infinity over <code>F</code>.
-<code>N</code> specifies the order of the Laguerre polynomial to use for the
-integration rule, which can be 2,4,6, or 8.</p>
+  <div class='apiref-doc'><p>Create a lambda that integrates a region over <code>F</code>. The region will
+be divided into <code>N</code> segments, and <code>INTEGRATOR</code> will be used to
+integrate each segment. The lambda takes the lower and upper limits of
+the region as parameters.</p>
 
   </div>
 </section>
