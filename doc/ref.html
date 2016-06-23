@@ -211,6 +211,17 @@ the region as parameters.</p>
 
   </div>
 </section>
+<section id='apiref-monte-carlo' class='section-apiref-item'>
+  <div class='apiref-spec'>MONTE-CARLO
+  </div>
+  <div class='apiref-lambda'>(F A B &amp;KEY (N 1000) (RANDOM (LAMBDA () (RANDOM 1.0d0 (MAKE-RANDOM-STATE T)))))
+  </div>
+  <div class='apiref-doc'><p>Use monte-carlo integration to estimate the integral of <code>F</code> from
+<code>A</code> to <code>B</code>. Use <code>N</code> samples for the estimate. <code>RANDOM</code> should be a
+lambda that returns a value between 0 and 1 every time it is called.</p>
+
+  </div>
+</section>
 <section id='apiref-piecewise/2' class='section-apiref-item'>
   <div class='apiref-spec'>PIECEWISE/2
   </div>
@@ -275,6 +286,37 @@ applying richardson extrapolation to the specified integrator. If
 the ratio of error reduction between consecutive steps, which should
 normally be around 4; the deviation allowed should be around 0.4, or
 leave NIL to disable this feature.</p>
+
+  </div>
+</section>
+<section id='apiref-running-monte-carlo' class='section-apiref-item'>
+  <div class='apiref-spec'>RUNNING-MONTE-CARLO
+  </div>
+  <div class='apiref-lambda'>(F A B)
+  </div>
+  <div class='apiref-doc'><p>Create a lambda that can be called with successive values ranging
+randomly over the range from <code>A</code> to <code>B</code>. The lambda returns the
+estimated integral of <code>F</code> between <code>A</code> and <code>B</code>, and the standard
+deviation of the estimate.</p>
+
+  </div>
+</section>
+<section id='apiref-running-std-dev' class='section-apiref-item'>
+  <div class='apiref-spec'>RUNNING-STD-DEV
+  </div>
+  <div class='apiref-lambda'>()
+  </div>
+  <div class='apiref-doc'><p>Create a lambda that can be called with successive values. The lambda returns the
+standard deviation of the values it has been passed.</p>
+
+  </div>
+</section>
+<section id='apiref-standard-deviation' class='section-apiref-item'>
+  <div class='apiref-spec'>STANDARD-DEVIATION
+  </div>
+  <div class='apiref-lambda'>(LX)
+  </div>
+  <div class='apiref-doc'><p>Compute the standard deviation of the values in the list <code>LX</code>.</p>
 
   </div>
 </section>

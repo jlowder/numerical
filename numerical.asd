@@ -11,4 +11,5 @@
               ((:file "numerical")
                (:file "roots")
                (:file "interpolation")
-               (:file "integration")))))
+               (:file "integration")
+               (:file "diffeq")))))

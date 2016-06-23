@@ -372,6 +372,12 @@
       (ballpark exact (funcall gl8))
       (ballpark exact (funcall gl8+)))))
 
+(define-test monte-carlo
+  (labels ((f (x) (exp x)))
+    (let ((exact (- (exp 5) (exp 1)))
+          (mc (monte-carlo #'f 1 5 :n 10000)))
+      (assert-true (< (abs (- exact mc)) 2)))))
+
 (let ((*print-errors* t)
       (*print-failures* t))
   (run-tests))

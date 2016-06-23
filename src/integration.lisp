@@ -46,7 +46,10 @@
            :gauss-legendre/n+
            :gauss-legendre
            :gauss-legendre+
-           :monte-carlo))
+           :monte-carlo
+           :standard-deviation
+           :running-std-dev
+           :running-monte-carlo))
 
 (in-package :numerical.integration)
 
@@ -349,6 +352,51 @@ integration rule, which can be 2,4,6, or 8."
   (loop for i from 2 to 9 do (eval (defgaussian i)) (eval (defgaussian+ i)))
   (loop for i from 2 to 8 by 2 do (eval (deflaguerre i)) (eval (deflaguerre+ i))))
 
-(defun monte-carlo (f &key (n 1000) (random (lambda () (random 1d0 (make-random-state t)))))
-  (lambda (a b)
-    (* (- b a) (/ 1 n) (loop repeat n summing (funcall f (funcall random))))))
+(defun running-std-dev ()
+  "Create a lambda that can be called with successive values. The lambda returns the
+standard deviation of the values it has been passed."
+  (let ((sum1 0d0)
+        (sum2 0d0)
+        (n 0))
+    (lambda (xi)
+      (setq sum1 (+ sum1 (* xi xi)))
+      (setq sum2 (+ sum2 xi))
+      (incf n)
+      (if (eq 1 n)
+          0d0
+          (sqrt (/ (- (* (/ 1d0 n) sum1) (expt (* (/ 1d0 n) sum2) 2))
+                   (1- n)))))))
+
+(defun standard-deviation (lx)
+  "Compute the standard deviation of the values in the list `LX`."
+  (let ((rsd (running-std-dev)))
+    (loop for xi in lx
+       as v = (funcall rsd xi)
+       finally (return v))))
+
+(defun running-monte-carlo (f a b)
+  "Create a lambda that can be called with successive values ranging
+randomly over the range from `A` to `B`. The lambda returns the
+estimated integral of `F` between `A` and `B`, and the standard
+deviation of the estimate."
+  (let ((n 0)
+        (sd (running-std-dev))
+        (c (- b a))
+        (sum 0d0))
+    (lambda (x)
+      (let ((xi (funcall f x)))
+        (incf n)
+        (setq sum (+ sum xi))
+        (values (* c (/ 1 n) sum)
+                (funcall sd xi))))))
+
+(defun monte-carlo (f a b &key (n 1000) (random (lambda () (random 1d0 (make-random-state t)))))
+  "Use monte-carlo integration to estimate the integral of `F` from
+`A` to `B`. Use `N` samples for the estimate. `RANDOM` should be a
+lambda that returns a value between 0 and 1 every time it is called."
+  (flet ((xi ()
+           (+ a (* (- b a) (funcall random)))))
+    (let ((rmc (running-monte-carlo f a b)))
+      (loop repeat (1- n)
+         do (funcall rmc (xi)))
+      (funcall rmc (xi)))))
