@@ -60,4 +60,48 @@ to the result and `@` bound to the number of attempts."
   "divide, but avoid singularities"
   (let ((b (reduce #'* b)))
     (/ a (if (zerop b) +epsilon+ b))))
+
+;; define some utilities for stuffing expressions into lambdas as necessary
   
+(defun free-vars (e)
+  (labels ((rec (e)
+             (if (atom e)
+                 (when (and
+                        (not (null e))
+                        (symbolp e)
+                        (not (boundp e))
+                        (not (fboundp e)))
+                   (list e))
+                 (append (rec (car e)) (rec (cdr e))))))
+    (remove-duplicates (rec e))))
+  
+(defmacro genlambda/1 (e)
+  "take an expression and generate a 1-argument lambda"
+  (if (and (consp e)
+           (or
+            (eq (car e) 'FUNCTION)
+            (eq (car e) 'LAMBDA)))
+      `,e
+      (let ((fv (free-vars e)))
+        (cond ((eq 1 (length fv)) `(lambda ,fv ,e))
+              ((eq 0 (length fv)) (if (atom e)
+                                      `(lambda (x) (,e x))
+                                      `(lambda (r) (apply (quote ,(car e)) (append (list ,@(cdr e)) (list r))))))
+              (t (error "too many free variables - should have 1 at most"))))))
+
+(defmacro genlambda/2 (e)
+  "take an expression and generate a 2-argument lambda"
+  (if (and (consp e)
+           (or
+            (eq (car e) 'FUNCTION)
+            (eq (car e) 'LAMBDA)))
+      `,e
+      (let ((fv (free-vars e)))
+        (cond ((eq 2 (length fv)) `(lambda ,fv ,e))
+              ((or (eq 0 (length fv))
+                   (eq 1 (length fv)))
+               (if (atom e)
+                   `(lambda (x y) (,e x y))
+                   `(lambda (&rest r) (apply (quote ,(car e)) (append (list ,@(cdr e)) r)))))
+              (t (error "too many free variables - should have 2 at most"))))))
+
