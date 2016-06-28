@@ -5,7 +5,8 @@
   (:import-from :numerical
                 :/_
                 :+tolerance+
-                :+limit+)
+                :+limit+
+                :genlambda/1)
   (:export :lagrange-polynomial
            :lagrange/order
            :hermite/cubic
@@ -16,9 +17,7 @@
            :second-derivative/3
            :second-derivative/5
            :first-derivative
-           :first-derivative+
-           :second-derivative
-           :second-derivative+))
+           :second-derivative))
 
 (in-package :numerical.interpolation)
 
@@ -170,9 +169,10 @@ their function derivate evaluations."
 
 (defun cubic-spline (x f &optional fp1 fpn)
   "Create a lambda to approximate f(xx) using a cubic spline through a
-list of values and their function evaluations. The derivates at the
-endpoints may optionally be provided, in which case a clamped cubic
-spline will be used. Otherwise a natural cubic spline will be used."
+list of values `X` and their function evaluations `F`. The derivates
+at the endpoints may optionally be provided as `FP1` and `FPN`, in
+which case a clamped cubic spline will be used. Otherwise a natural
+cubic spline will be used."
   (flet ((h (j) (- (nth (1+ j) x) (nth j x)))
          (p (j) (- (nth (1+ j) f) (nth j f))))
     (let ((second (if fpn (clamped-cubic-spline x f fp1 fpn) (natural-cubic-spline x f))))
@@ -189,10 +189,10 @@ spline will be used. Otherwise a natural cubic spline will be used."
 
 (defun cubic-spline-prime (x f &optional fp1 fpn)
   "Create a lambda to approximate the derivative of f(xx) using a
-cubic spline through a list of values and their function
-evaluations. The derivates at the endpoints may optionally be
-provided, in which case a clamped cubic spline will be used. Otherwise
-a natural cubic spline will be used."
+cubic spline through a list of values `X` and their function
+evaluations `F`. The derivates at the endpoints may optionally be
+provided as `FP1` and `FPN`, in which case a clamped cubic spline will
+be used. Otherwise a natural cubic spline will be used."
   (flet ((h (j) (- (nth (1+ j) x) (nth j x)))
          (p (j) (- (nth (1+ j) f) (nth j f))))
     (let ((second (if fp1 (clamped-cubic-spline x f fp1 fpn) (natural-cubic-spline x f))))
@@ -205,75 +205,71 @@ a natural cubic spline will be used."
              (* qj (- xv xj))
              (* (- xv xj) (- xv xj) (/_ (- qj+1 qj) (* 2 (h j))))))))))
 
-(defun first-derivative/2 (f &key (step +step+))
+(defmacro first-derivative/2 (f &key (step +step+))
   "Create a lambda to approximate the first derivative of `F` at any point. `F` will be called
 2 times per approximation."
-  (lambda (x)
-    (/ (- (funcall f (+ x step)) (funcall f (- x step)))
-       (* 2d0 step))))
-
-(defun first-derivative/4 (f &key (step +step+))
+  (let ((g (gensym)))
+    `(let ((,g (genlambda/1 ,f)))
+       (lambda (x)
+         (/ (- (funcall ,g (+ x ,step)) (funcall ,g (- x ,step)))
+            (* 2d0 ,step))))))
+    
+(defmacro first-derivative/4 (f &key (step +step+))
   "Create a lambda to approximate the first derivative of `F` at any point. `F` will be called
 4 times per approximation."
-  (lambda (x)
-    (/ (+ (funcall f (- x step step))
-          (* -8d0 (funcall f (- x step)))
-          (* 8d0 (funcall f (+ x step)))
-          (* -1d0 (funcall f (+ x step step))))
-       (* 12d0 step))))
+  (let ((g (gensym)))
+    `(let ((,g (genlambda/1 ,f)))
+       (lambda (x)
+         (/ (+ (funcall ,g (- x ,step ,step))
+               (* -8d0 (funcall ,g (- x ,step)))
+               (* 8d0 (funcall ,g (+ x ,step)))
+               (* -1d0 (funcall ,g (+ x ,step ,step))))
+            (* 12d0 ,step))))))
 
-(defun second-derivative/3 (f &key (step +step+))
+(defmacro second-derivative/3 (f &key (step +step+))
   "Create a lambda to approximate the second derivative of `F` at any point. `F` will be called
 3 times per approximation."
-  (lambda (x)
-    (/ (+ (funcall f x) (* -2d0 (funcall f (+ x step))) (funcall f (+ x step step)))
-       (* step step))))
-
-(defun second-derivative/5 (f &key (step +step+))
+  (let ((g (gensym)))
+    `(let ((,g (genlambda/1 ,f)))
+       (lambda (x)
+         (/ (+ (funcall ,g x) (* -2d0 (funcall ,g (+ x ,step))) (funcall ,g (+ x ,step ,step)))
+            (* ,step ,step))))))
+    
+(defmacro second-derivative/5 (f &key (step +step+))
   "Create a lambda to approximate the second derivative of `F` at any point. `F` will be called
 5 times per approximation."
-  (lambda (x)
-    (/ (+ (* -1d0 (funcall f (- x step step)))
-          (* 16d0 (funcall f (- x step)))
-          (* -30d0 (funcall f x))
-          (* 16d0 (funcall f (+ x step)))
-          (* -1d0 (funcall f (+ x step step))))
-       (* 12d0 step step))))
+  (let ((g (gensym)))
+    `(let ((,g (genlambda/1 ,f)))
+       (lambda (x)
+         (/ (+ (* -1d0 (funcall ,g (- x ,step ,step)))
+               (* 16d0 (funcall ,g (- x ,step)))
+               (* -30d0 (funcall ,g x))
+               (* 16d0 (funcall ,g (+ x ,step)))
+               (* -1d0 (funcall ,g (+ x ,step ,step))))
+            (* 12d0 ,step ,step))))))
+    
+(defmacro richardson-extrapolation (f df h tol limit)
+  `(labels ((di+1 (i dih di2h)
+              (/_ (- (* (expt 2d0 (+ i i)) dih) di2h)
+                  (1- (expt 2d0 (+ i i)))))
+            (rec (x &optional (i 1) (h ,h) (dh (funcall (,df ,f :step h) x)))
+              (let ((x (coerce x 'double-float)))
+                (if (>= i ,limit)
+                    (values dh nil i)
+                    (let ((nv (di+1 (1+ i) (funcall (,df ,f :step (/ h 2d0)) x) dh)))
+                      (if (< (abs (/_ (- nv dh) nv)) ,tol)
+                          (values nv t i)
+                          (rec x (1+ i) (/ h 2d0) nv)))))))
+     #'rec))
 
-(defun richardson-extrapolation (f df h tol limit)
-  (labels ((di+1 (i dih di2h)
-             (/_ (- (* (expt 2d0 (+ i i)) dih) di2h)
-                 (1- (expt 2d0 (+ i i)))))
-           (rec (x &optional (i 1) (h h) (dh (funcall (funcall df f :step h) x)))
-             (let ((x (coerce x 'double-float)))
-               (if (>= i limit)
-                   (values dh nil i)
-                   (let ((nv (di+1 (1+ i) (funcall (funcall df f :step (/ h 2d0)) x) dh)))
-                     (if (< (abs (/_ (- nv dh) nv)) tol)
-                         (values nv t i)
-                         (rec x (1+ i) (/ h 2d0) nv)))))))
-    #'rec))
-
-(defun first-derivative (f &key (step +step+) (tolerance +tolerance+) (limit +limit+))
+(defmacro first-derivative (f &key (step +step+) (tolerance +tolerance+) (limit +limit+))
   "Create a lambda to approximate the first derivative of a function
 at any point. Richardson extrapolation will be used to converge on the
 solution down to a specified tolerance."
-  (richardson-extrapolation f #'first-derivative/2 step tolerance limit))
+  `(richardson-extrapolation ,f first-derivative/2 ,step ,tolerance ,limit))
 
-(defmacro first-derivative+ ((x &key (step +step+) (tolerance +tolerance+) (limit +limit+)) f)
-  "Create a lambda to approximate the first derivative of a function
-at any point. Richardson extrapolation will be used to converge on the
-solution down to a specified tolerance."
-  `(richardson-extrapolation #'(lambda (,x) ,f) #'first-derivative/2 ,step ,tolerance ,limit))
-
-(defun second-derivative (f &key (step +step+) (tolerance +tolerance+) (limit +limit+))
+(defmacro second-derivative (f &key (step +step+) (tolerance +tolerance+) (limit +limit+))
   "Create a lambda to approximate the second derivative of a function
 at any point. Richardson extrapolation will be used to converge on the
 solution down to a specified tolerance."
-  (richardson-extrapolation f #'second-derivative/3 step tolerance limit))
-
-(defmacro second-derivative+ ((x &key (step +step+) (tolerance +tolerance+) (limit +limit+)) f)
-  "Create a lambda to approximate the second derivative of a function
-at any point. Richardson extrapolation will be used to converge on the
-solution down to a specified tolerance."
-  `(richardson-extrapolation #'(lambda (,x) ,f) #'second-derivative/3 ,step ,tolerance ,limit))
+  `(richardson-extrapolation ,f second-derivative/3 ,step ,tolerance ,limit))

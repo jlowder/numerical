@@ -85,7 +85,9 @@ to the result and `@` bound to the number of attempts."
       (let ((fv (free-vars e)))
         (cond ((eq 1 (length fv)) `(lambda ,fv ,e))
               ((eq 0 (length fv)) (if (atom e)
-                                      `(lambda (x) (,e x))
+                                      (if (null e)
+                                          `(lambda (x) (declare (ignore x)) nil)
+                                          `(lambda (x) (,e x)))
                                       `(lambda (r) (apply (quote ,(car e)) (append (list ,@(cdr e)) (list r))))))
               (t (error "too many free variables - should have 1 at most"))))))
 
