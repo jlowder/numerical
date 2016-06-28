@@ -9,7 +9,8 @@
   (:export :euler
            :modified-euler
            :improved-euler
-           :runge-kutta/4))
+           :runge-kutta/4
+           :extrapolated-midpoint/4))
 
 (in-package :numerical.diffeq)
 
