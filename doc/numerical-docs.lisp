@@ -15,4 +15,5 @@
           (:apiref :numerical
                    :numerical.integration 
                    :numerical.roots
+                   :numerical.diffeq
                    :numerical.interpolation)))

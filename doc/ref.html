@@ -423,6 +423,87 @@ converge. The lambda takes the lower and upper values as parameters.</p>
 </section>
 </section>
 </article>
+<article id='reference-numerical.diffeq' class='apiref-article'>
+  <h1>Reference: NUMERICAL.DIFFEQ
+  </h1>
+<section id='numerical.diffeq-functions' class='section-functions'>
+  <h2>Functions
+  </h2>
+<section id='apiref-extrapolated-midpoint/4' class='section-apiref-item'>
+  <div class='apiref-spec'>EXTRAPOLATED-MIDPOINT/4
+  </div>
+  <div class='apiref-lambda'>(FXY)
+  </div>
+  <div class='apiref-doc'><p>Create a lambda that can evaluate a first-order ordinary
+differential equation <code>FXY</code>. The lambda takes the limits of the region
+to evaluate as parameters, an <code>N</code> keyword argument for the number of
+steps to take, and an <code>INITIAL</code> keyword argument for the initial
+value. The lambda will use the Modified Euler (i.e. midpoint) method
+in combination with Richardson Extrapolation to evaluate the result.</p>
+
+  </div>
+</section>
+</section>
+<section id='numerical.diffeq-macros' class='section-macros'>
+  <h2>Macros
+  </h2>
+<section id='apiref-euler' class='section-apiref-item'>
+  <div class='apiref-spec'>EULER
+  </div>
+  <div class='apiref-lambda'>(FXY)
+  </div>
+  <div class='apiref-doc'><p>Create a lambda that can evaluate a first-order ordinary
+differential equation <code>FXY</code>. The lambda takes the limits of the region
+to evaluate as parameters, an <code>N</code> keyword argument for the number of
+steps to take, and an <code>INITIAL</code> keyword argument for the initial
+value. The lambda will use the Euler method to evaluate the result.</p>
+
+  </div>
+</section>
+<section id='apiref-improved-euler' class='section-apiref-item'>
+  <div class='apiref-spec'>IMPROVED-EULER
+  </div>
+  <div class='apiref-lambda'>(FXY)
+  </div>
+  <div class='apiref-doc'><p>Create a lambda that can evaluate a first-order ordinary
+differential equation <code>FXY</code>. The lambda takes the limits of the region
+to evaluate as parameters, an <code>N</code> keyword argument for the number of
+steps to take, and an <code>INITIAL</code> keyword argument for the initial
+value. The lambda will use the Improved Euler method to evaluate the
+result.</p>
+
+  </div>
+</section>
+<section id='apiref-modified-euler' class='section-apiref-item'>
+  <div class='apiref-spec'>MODIFIED-EULER
+  </div>
+  <div class='apiref-lambda'>(FXY)
+  </div>
+  <div class='apiref-doc'><p>Create a lambda that can evaluate a first-order ordinary
+differential equation <code>FXY</code>. The lambda takes the limits of the region
+to evaluate as parameters, an <code>N</code> keyword argument for the number of
+steps to take, and an <code>INITIAL</code> keyword argument for the initial
+value. The lambda will use the Modified Euler method to evaluate the
+result.</p>
+
+  </div>
+</section>
+<section id='apiref-runge-kutta/4' class='section-apiref-item'>
+  <div class='apiref-spec'>RUNGE-KUTTA/4
+  </div>
+  <div class='apiref-lambda'>(FXY)
+  </div>
+  <div class='apiref-doc'><p>Create a lambda that can evaluate a first-order ordinary
+differential equation <code>FXY</code>. The lambda takes the limits of the region
+to evaluate as parameters, an <code>N</code> keyword argument for the number of
+steps to take, and an <code>INITIAL</code> keyword argument for the initial
+value. The lambda will use the 4th Order Runge-Kutta method to
+evaluate the result.</p>
+
+  </div>
+</section>
+</section>
+</article>
 <article id='reference-numerical.interpolation' class='apiref-article'>
   <h1>Reference: NUMERICAL.INTERPOLATION
   </h1>
