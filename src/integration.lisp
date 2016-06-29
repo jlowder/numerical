@@ -6,8 +6,7 @@
                 :/_
                 :+tolerance+
                 :+limit+
-                :genlambda/1
-                :genlambda/2)
+                :genlambda/1)
   (:export :piecewise/2
            :piecewise/3
            :piecewise/4
@@ -15,33 +14,19 @@
            :romberg
            :euler-mcclaurin
            :gauss-laguerre/2
-           :gauss-laguerre/2+
            :gauss-laguerre/4
-           :gauss-laguerre/4+
            :gauss-laguerre/6
-           :gauss-laguerre/6+
            :gauss-laguerre/8
-           :gauss-laguerre/8+
            :gauss-legendre/2
-           :gauss-legendre/2+
            :gauss-legendre/3
-           :gauss-legendre/3+
            :gauss-legendre/4
-           :gauss-legendre/4+
            :gauss-legendre/5
-           :gauss-legendre/5+
            :gauss-legendre/6
-           :gauss-legendre/6+
            :gauss-legendre/7
-           :gauss-legendre/7+
            :gauss-legendre/8
-           :gauss-legendre/8+
            :gauss-legendre/9
-           :gauss-legendre/9+
            :gauss-legendre/n
-           :gauss-legendre/n+
            :gauss-legendre
-           :gauss-legendre+
            :monte-carlo
            :standard-deviation
            :running-std-dev
@@ -141,7 +126,7 @@ leave NIL to disable this feature."
                        (err (if Pext (* (/_ 1d0 div) (- ext Pext)) err3))
                        (ext2 (+ ext err))
                        (R (if (and ,ratio-limit Ih*4 (not (equal Ih*2 Ih))) (abs (/_ (- Ih*4 Ih*2)
-                                                                                    (- Ih*2 Ih)))
+                                                                                     (- Ih*2 Ih)))
                               4)))
                   (if (and Pext
                            (> i 3)
@@ -177,136 +162,117 @@ divide the region into."
                         0)))
            (+ (funcall integrator l u n) (* (/ 1d0 12) h h df) (* (/ -1d0 720) h h h h df3)))))))
 
-(defun gaussian-quadrature/n (f n)
+(defmacro gaussian-quadrature/n (f n)
   "Create a lambda that integrates a region over `F`. The lambda takes
 the lower and upper limits of the region as parameters. `N` specifies
 the order of the Legendre polynomial to use for the integration rule,
 which can range from 2 to 9."
-  (flet ((gq (ti ci)
-           (lambda (a b)
-             (let ((m (/ (- b a) 2d0))
-                   (c (/ (+ b a) 2d0)))
-               (flet ((Ft (x)
-                        (funcall f (+ c (* m x)))))
-                 (* m (loop for v in ti
-                         for z in ci
-                         summing (* z (Ft v)))))))))
-    (apply #'gq (cond ((eql n 2) '((-.577350269189626d0 .577350269189626d0)
-                                   (1 1)))
-                      ((eql n 3) '((-0.774596669241483d0 0d0 0.774596669241483d0)
-                                   (5/9 8/9 5/9)))
-                      ((eql n 4) '((-0.861136311594053d0 -0.339981043584856d0 0.339981043584856d0 0.861136311594053d0)
-                                   (0.347854845137454d0 0.652145154862546d0 0.652145154862546d0 0.347854845137454d0)))
-                      ((eql n 5) '((-0.906179845938664d0 -0.538469310105683d0 0d0 0.538469310105683d0 0.906179845938664d0)
-                                   (0.236926885056189d0 0.478628670499366d0 0.5688888888889d0 0.478628670499366d0 0.236926885056189d0)))
-                      ((eql n 6) '((-0.932469514203152d0 -0.661209386466265d0 -0.238619186083197d0
-                                    0.238619186083197d0 0.661209386466265d0 0.932469514203152d0)
-                                   (0.171324492379170d0 0.360761573048139d0 0.467913934572691d0
-                                    0.467913934572691d0 0.360761573048139d0 0.171324492379170d0)))
-                      ((eql n 7) '((-0.949107912342759d0 -0.741531185599394d0 -0.405845151377397d0 0d0 0.405845151377397d0
-                                     0.741531185599394d0 0.949107912342759d0)
-                                   (0.129484966168870d0 0.279705391489277d0 0.381830050505119d0 0.417959183673469d0
-                                    0.381830050505119d0 0.279705391489277d0 0.129484966168870d0)))
-                      ((eql n 8) '((-0.960289856497536d0 -0.796666477413627d0 -0.525532409916329d0 -0.183434642495650d0
-                                    0.183434642495650d0 0.525532409916329d0 0.796666477413627d0 0.960289856497536d0)
-                                   (0.101228536290376d0 0.222381034453374d0 0.313706645877887d0 0.362683783378362d0
-                                    0.362683783378362d0 0.313706645877887d0 0.222381034453374d0 0.101228536290376d0)))
-                      ((eql n 9) '((-0.968160239507626d0 -0.836031107326636d0 -0.613371432700590d0 -0.324253423403809d0 0d0
-                                    0.324253423403809d0 0.613371432700590d0 0.836031107326636d0 0.968160239507626d0)
-                                   (0.081274388361574d0 0.180648160694857d0 0.260610696402935d0 0.312347077040003d0 0.33023935501260d0
-                                    0.312347077040003d0 0.260610696402935d0 0.180648160694857d0 0.081274388361574d0)))))))
+  (let ((g (gensym)))
+    `(let ((,g (genlambda/1 ,f)))
+       (flet ((gq (ti ci)
+                (lambda (a b)
+                  (let ((m (/ (- b a) 2d0))
+                        (c (/ (+ b a) 2d0)))
+                    (flet ((Ft (x)
+                             (funcall ,g (+ c (* m x)))))
+                      (* m (loop for v in ti
+                              for z in ci
+                              summing (* z (Ft v)))))))))
+         (apply #'gq (cond ((eql ,n 2) '((-.577350269189626d0 .577350269189626d0)
+                                         (1 1)))
+                           ((eql ,n 3) '((-0.774596669241483d0 0d0 0.774596669241483d0)
+                                         (5/9 8/9 5/9)))
+                           ((eql ,n 4) '((-0.861136311594053d0 -0.339981043584856d0 0.339981043584856d0 0.861136311594053d0)
+                                         (0.347854845137454d0 0.652145154862546d0 0.652145154862546d0 0.347854845137454d0)))
+                           ((eql ,n 5) '((-0.906179845938664d0 -0.538469310105683d0 0d0 0.538469310105683d0 0.906179845938664d0)
+                                         (0.236926885056189d0 0.478628670499366d0 0.5688888888889d0 0.478628670499366d0 0.236926885056189d0)))
+                           ((eql ,n 6) '((-0.932469514203152d0 -0.661209386466265d0 -0.238619186083197d0
+                                          0.238619186083197d0 0.661209386466265d0 0.932469514203152d0)
+                                         (0.171324492379170d0 0.360761573048139d0 0.467913934572691d0
+                                          0.467913934572691d0 0.360761573048139d0 0.171324492379170d0)))
+                           ((eql ,n 7) '((-0.949107912342759d0 -0.741531185599394d0 -0.405845151377397d0 0d0 0.405845151377397d0
+                                          0.741531185599394d0 0.949107912342759d0)
+                                         (0.129484966168870d0 0.279705391489277d0 0.381830050505119d0 0.417959183673469d0
+                                          0.381830050505119d0 0.279705391489277d0 0.129484966168870d0)))
+                           ((eql ,n 8) '((-0.960289856497536d0 -0.796666477413627d0 -0.525532409916329d0 -0.183434642495650d0
+                                          0.183434642495650d0 0.525532409916329d0 0.796666477413627d0 0.960289856497536d0)
+                                         (0.101228536290376d0 0.222381034453374d0 0.313706645877887d0 0.362683783378362d0
+                                          0.362683783378362d0 0.313706645877887d0 0.222381034453374d0 0.101228536290376d0)))
+                           ((eql ,n 9) '((-0.968160239507626d0 -0.836031107326636d0 -0.613371432700590d0 -0.324253423403809d0 0d0
+                                          0.324253423403809d0 0.613371432700590d0 0.836031107326636d0 0.968160239507626d0)
+                                         (0.081274388361574d0 0.180648160694857d0 0.260610696402935d0 0.312347077040003d0 0.33023935501260d0
+                                          0.312347077040003d0 0.260610696402935d0 0.180648160694857d0 0.081274388361574d0)))))))))
 
-(defun gauss-legendre/n (f &key (n 1) (integrator #'gauss-legendre/4))
+(defmacro gauss-legendre/n (f &key (n 1) (integrator 'gauss-legendre/4))
   "Create a lambda that integrates a region over `F`. The region will
 be divided into `N` segments, and `INTEGRATOR` will be used to
 integrate each segment. The lambda takes the lower and upper limits of
 the region as parameters."
-  (let ((integrator (funcall integrator f)))
-    (lambda (a b)
-      (let ((h (/ (- b a) n)))
-        (loop repeat n
-           as l = a then (+ l h)
-           as u = (+ a h) then (+ u h)
-           summing (funcall integrator l u))))))
+  `(let ((integrator (,integrator ,f)))
+     (lambda (a b)
+       (let ((h (/ (- b a) ,n)))
+         (loop repeat ,n
+            as l = a then (+ l h)
+            as u = (+ a h) then (+ u h)
+            summing (funcall integrator l u))))))
 
-(defmacro gauss-legendre/n+ ((x &key (n 1) (integrator #'gauss-legendre/4)) f)
-  "Create a lambda that integrates a region over `F`. The region will
-be divided into `N` segments, and `INTEGRATOR` will be used to
-integrate each segment. The lambda takes the lower and upper limits of
-the region as parameters."
-  `(gauss-legendre/n (lambda (,x) ,f) :n ,n :integrator ,integrator))
-
-(defun gauss-legendre (f &key (integrator #'gauss-legendre/4) (tolerance +tolerance+) (limit +limit+))
+(defmacro gauss-legendre (f &key (integrator 'gauss-legendre/4) (tolerance +tolerance+) (limit +limit+))
   "Create a lambda that integrates a region over `F`.
 `INTEGRATOR` specifies the algorithm to use. The region will be
 subdivided into progressively smaller regions in order to converge to
 the specified accuracy, within the specified iteration limit. The
 lambda takes the lower and upper limits of the region as parameters."
-  (lambda (a b)
-    (loop for x from 2 to (1- limit)
-       as iny = (funcall (gauss-legendre/n f :n x :integrator integrator) a b) then inx
-       as inx = (funcall (gauss-legendre/n f :n (1+ x) :integrator integrator) a b)
-       as corr = (abs (/_ (- inx iny) inx))
-       do (when (> tolerance corr) (return (values inx t x)))
-       finally (return (values inx nil x)))))
+  `(lambda (a b)
+     (loop for x from 2 to (1- ,limit)
+        as iny = (funcall (gauss-legendre/n ,f :n x :integrator ,integrator) a b) then inx
+        as inx = (funcall (gauss-legendre/n ,f :n (1+ x) :integrator ,integrator) a b)
+        as corr = (abs (/_ (- inx iny) inx))
+        do (when (> ,tolerance corr) (return (values inx t x)))
+        finally (return (values inx nil x)))))
 
-(defmacro gauss-legendre+ ((x &key (integrator #'gauss-legendre/4) (tolerance +tolerance+) (limit +limit+)) f)
-  "Create a lambda that integrates a region over `F`.
-`INTEGRATOR` specifies the algorithm to use. The region will be
-subdivided into progressively smaller regions in order to converge to
-the specified accuracy, within the specified iteration limit. The
-lambda takes the lower and upper limits of the region as parameters."
-  `(gauss-legendre (lambda (,x) ,f) :integrator ,integrator :tolerance ,tolerance :limit ,limit))
-
-(defun laguerre-quadrature/n (f n)
+(defmacro laguerre-quadrature/n (f n)
   "Create a lambda that integrates the region from 0 to infinity over `F`.
 `N` specifies the order of the Laguerre polynomial to use for the
 integration rule, which can be 2,4,6, or 8."
-  (flet ((lq (ti ci)
-           (lambda ()
-             (loop for v in ti
-                for z in ci
-                summing (* z (funcall f v))))))
-    (apply #'lq (cond ((eql n 2) '((.5857864376269050d0 3.414213562373095d0)
-                                   (.8535533905932738d0 .1464466094067262d0)))
-                      ((eql n 4) '((.3225476896193923d0 1.745761101158347d0
-                                    4.536620296921128d0 9.395070912301133d0)
-                                   (.6031541043416336d0 .3574186924377997d0
-                                    .03888790851500538d0 .0005392947055613275d0)))
-                      ((eql n 6) '((.2228466041792607d0 1.188932101672623d0
-                                    2.992736326059314d0 5.775143569104511d0
-                                    9.837467418382590d0 15.98287398060170d0)
-                                   (.4589646739499636d0 .4170008307721210d0
-                                    .1133733820740450d0 .01039919745314907d0
-                                    .0002610172028149321d0 .0000008985479064296212d0)))
-                      ((eql n 8) '((.1702796323051010d0 .9037017767993799d0
-                                    2.251086629866131d0 4.266700170287659d0
-                                    7.045905402393466d0 10.75851601018100d0
-                                    15.74067864127800d0 22.86313173688926d0)
-                                   (.3691885893416375d0 .4187867808143430d0
-                                    .1757949866371718d0 .03334349226121565d0
-                                    .002794536235225673d0 .00009076508773358213d0
-                                    .0000008485746716272532d0 .000000001048001174871510d0)))))))
+  (let ((g (gensym)))
+    `(let ((,g (genlambda/1 ,f)))
+       (flet ((lq (ti ci)
+                (lambda ()
+                  (loop for v in ti
+                     for z in ci
+                     summing (* z (funcall ,f v))))))
+         (apply #'lq (cond ((eql ,n 2) '((.5857864376269050d0 3.414213562373095d0)
+                                         (.8535533905932738d0 .1464466094067262d0)))
+                           ((eql ,n 4) '((.3225476896193923d0 1.745761101158347d0
+                                          4.536620296921128d0 9.395070912301133d0)
+                                         (.6031541043416336d0 .3574186924377997d0
+                                          .03888790851500538d0 .0005392947055613275d0)))
+                           ((eql ,n 6) '((.2228466041792607d0 1.188932101672623d0
+                                          2.992736326059314d0 5.775143569104511d0
+                                          9.837467418382590d0 15.98287398060170d0)
+                                         (.4589646739499636d0 .4170008307721210d0
+                                          .1133733820740450d0 .01039919745314907d0
+                                          .0002610172028149321d0 .0000008985479064296212d0)))
+                           ((eql ,n 8) '((.1702796323051010d0 .9037017767993799d0
+                                          2.251086629866131d0 4.266700170287659d0
+                                          7.045905402393466d0 10.75851601018100d0
+                                          15.74067864127800d0 22.86313173688926d0)
+                                         (.3691885893416375d0 .4187867808143430d0
+                                          .1757949866371718d0 .03334349226121565d0
+                                          .002794536235225673d0 .00009076508773358213d0
+                                          .0000008485746716272532d0 .000000001048001174871510d0)))))))))
 
 (eval-when (:execute :load-toplevel :compile-toplevel)
   (defun defgaussian (n)
-    `(defun ,(intern (format nil "GAUSS-LEGENDRE/~A" n)) (f)
+    `(defmacro ,(intern (format nil "GAUSS-LEGENDRE/~A" n)) (f)
        ,(format nil "Create a lambda that integrates a region over `F` using a Legendre polynomial~%of order ~A. The lambda takes the lower and upper limits of the region as parameters." n)
-       (gaussian-quadrature/n f ,n)))
-  (defun defgaussian+ (n)
-    `(defmacro ,(intern (format nil "GAUSS-LEGENDRE/~A+" n)) ((x) f)
-       ,(format nil "Create a lambda that integrates a region over `F` using a Legendre polynomial~%of order ~A. The lambda takes the lower and upper limits of the region as parameters." n)
-       `(gaussian-quadrature/n (lambda (,x) ,f) ,,n)))
+       `(gaussian-quadrature/n ,f ,,n)))
   (defun deflaguerre (n)
-    `(defun ,(intern (format nil "GAUSS-LAGUERRE/~A" n)) (f)
+    `(defmacro ,(intern (format nil "GAUSS-LAGUERRE/~A" n)) (f)
        ,(format nil "Create a lambda that integrates the region from 0 to infinity over `F` using a Laguerre polynomial of order ~A." n)
-       (laguerre-quadrature/n f ,n)))
-  (defun deflaguerre+ (n)
-    `(defmacro ,(intern (format nil "GAUSS-LAGUERRE/~A+" n)) ((x) f)
-       ,(format nil "Create a lambda that integrates the region from 0 to infinity over `F` using a Laguerre polynomial of order ~A." n)
-       `(laguerre-quadrature/n (lambda (,x) ,f) ,,n)))
-  (loop for i from 2 to 9 do (eval (defgaussian i)) (eval (defgaussian+ i)))
-  (loop for i from 2 to 8 by 2 do (eval (deflaguerre i)) (eval (deflaguerre+ i))))
+       `(laguerre-quadrature/n ,f ,,n)))
+  (loop for i from 2 to 9 do (eval (defgaussian i)))
+  (loop for i from 2 to 8 by 2 do (eval (deflaguerre i))))
 
 (defun running-std-dev ()
   "Create a lambda that can be called with successive values. The lambda returns the
@@ -330,29 +296,31 @@ standard deviation of the values it has been passed."
        as v = (funcall rsd xi)
        finally (return v))))
 
-(defun running-monte-carlo (f a b)
+(defmacro running-monte-carlo (f a b)
   "Create a lambda that can be called with successive values ranging
 randomly over the range from `A` to `B`. The lambda returns the
 estimated integral of `F` between `A` and `B`, and the standard
 deviation of the estimate."
-  (let ((n 0)
-        (sd (running-std-dev))
-        (c (- b a))
-        (sum 0d0))
-    (lambda (x)
-      (let ((xi (funcall f x)))
-        (incf n)
-        (setq sum (+ sum xi))
-        (values (* c (/ 1 n) sum)
-                (funcall sd xi))))))
+  (let ((g (gensym)))
+    `(let ((,g (genlambda/1 ,f)))
+       (let ((n 0)
+             (sd (running-std-dev))
+             (c (- ,b ,a))
+             (sum 0d0))
+         (lambda (x)
+           (let ((xi (funcall ,g x)))
+             (incf n)
+             (setq sum (+ sum xi))
+             (values (* c (/ 1 n) sum)
+                     (funcall sd xi))))))))
 
-(defun monte-carlo (f a b &key (n 1000) (random (lambda () (random 1d0 (make-random-state t)))))
+(defmacro monte-carlo (f a b &key (n 1000) (random (lambda () (random 1d0 (make-random-state t)))))
   "Use monte-carlo integration to estimate the integral of `F` from
 `A` to `B`. Use `N` samples for the estimate. `RANDOM` should be a
 lambda that returns a value between 0 and 1 every time it is called."
-  (flet ((xi ()
-           (+ a (* (- b a) (funcall random)))))
-    (let ((rmc (running-monte-carlo f a b)))
-      (loop repeat (1- n)
-         do (funcall rmc (xi)))
-      (funcall rmc (xi)))))
+  `(flet ((xi ()
+            (+ ,a (* (- ,b ,a) (funcall ,random)))))
+     (let ((rmc (running-monte-carlo ,f ,a ,b)))
+       (loop repeat (1- ,n)
+          do (funcall rmc (xi)))
+       (funcall rmc (xi)))))
