@@ -3,6 +3,7 @@
         :numerical
         :numerical.integration 
         :numerical.roots
+        :numerical.diffeq
         :numerical.interpolation)
   (:export #:generate))
 
