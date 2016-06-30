@@ -51,7 +51,7 @@
   (assert-error 'simple-error (eval (read-from-string "(genlambda/2 (+ (* x y z) x x 4))")))
   (assert-equal (values '(lambda (x y) (+ (* x y) x x 4)) t) (macroexpand-1 '(genlambda/2 (+ (* x y) x x 4))))
   (assert-equal (values '(lambda (x) (+ x 2)) t) (macroexpand-1 '(genlambda/1 (+ x 2))))
-  (assert-nil (funcall (genlambda/1 nil) 25))
+  (assert-equal nil (funcall (genlambda/1 nil) 25))
   (assert-equal (values '#'sin t) (macroexpand-1 '(genlambda/1 #'sin)))
   (assert-equal (values '(lambda (numerical::x) (sin numerical::x)) t) (macroexpand-1 '(genlambda/1 sin)))
   (assert-equal 56 (funcall (genlambda/2 (* x y)) 8 7))
