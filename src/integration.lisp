@@ -139,7 +139,7 @@ leave NIL to disable this feature."
                           (values ext2 nil i))))))
        #'rec)))
 
-(defmacro euler-mcclaurin (f &optional df df3)
+(defmacro euler-mcclaurin (f &optional (df nil df-p) (df3 nil df3-p))
   "Create a lambda that integrates a region over `F`, where `DF` is
 the first derivative function of `F` and `DF3` is the third derivative
 function of `F`. `DF` and `DF3` are both optional; if neither is
@@ -150,14 +150,14 @@ of the region as parameters, and optionally the number of segments to
 divide the region into."
   (let ((dg (gensym))
         (dg3 (gensym)))
-    `(let ((,dg (if ,df (genlambda/1 ,df) nil))
-           (,dg3 (if ,df3 (genlambda/1 ,df3) nil)))
+    `(let ((,dg (if ,df-p (genlambda/1 ,df) nil))
+           (,dg3 (if ,df3-p (genlambda/1 ,df3) nil)))
        (lambda (l u &optional (n 1) (integrator (piecewise/2 ,f)))
          (let ((h (/ (- u l) n))
-               (df (if ,df
+               (df (if ,df-p
                        (- (funcall ,dg l) (funcall ,dg u))
                        0))
-               (df3 (if ,df3
+               (df3 (if ,df3-p
                         (- (funcall ,dg3 l) (funcall ,dg3 u))
                         0)))
            (+ (funcall integrator l u n) (* (/ 1d0 12) h h df) (* (/ -1d0 720) h h h h df3)))))))
@@ -240,7 +240,7 @@ integration rule, which can be 2,4,6, or 8."
                 (lambda ()
                   (loop for v in ti
                      for z in ci
-                     summing (* z (funcall ,f v))))))
+                     summing (* z (funcall ,g v))))))
          (apply #'lq (cond ((eql ,n 2) '((.5857864376269050d0 3.414213562373095d0)
                                          (.8535533905932738d0 .1464466094067262d0)))
                            ((eql ,n 4) '((.3225476896193923d0 1.745761101158347d0
@@ -323,4 +323,4 @@ lambda that returns a value between 0 and 1 every time it is called."
      (let ((rmc (running-monte-carlo ,f ,a ,b)))
        (loop repeat (1- ,n)
           do (funcall rmc (xi)))
-       (funcall rmc (xi)))))
+       (funcall rmc (xi))))) ; pass multiple value return from final rmc call

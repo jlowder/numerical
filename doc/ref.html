@@ -80,7 +80,7 @@ standard deviation of the values it has been passed.</p>
 <section id='apiref-euler-mcclaurin' class='section-apiref-item'>
   <div class='apiref-spec'>EULER-MCCLAURIN
   </div>
-  <div class='apiref-lambda'>(F &amp;OPTIONAL DF DF3)
+  <div class='apiref-lambda'>(F &amp;OPTIONAL (DF NIL DF-P) (DF3 NIL DF3-P))
   </div>
   <div class='apiref-doc'><p>Create a lambda that integrates a region over <code>F</code>, where <code>DF</code> is
 the first derivative function of <code>F</code> and <code>DF3</code> is the third derivative
@@ -426,24 +426,6 @@ converge. The lambda takes the lower and upper values as parameters.</p>
 <article id='reference-numerical.diffeq' class='apiref-article'>
   <h1>Reference: NUMERICAL.DIFFEQ
   </h1>
-<section id='numerical.diffeq-functions' class='section-functions'>
-  <h2>Functions
-  </h2>
-<section id='apiref-extrapolated-midpoint/4' class='section-apiref-item'>
-  <div class='apiref-spec'>EXTRAPOLATED-MIDPOINT/4
-  </div>
-  <div class='apiref-lambda'>(FXY)
-  </div>
-  <div class='apiref-doc'><p>Create a lambda that can evaluate a first-order ordinary
-differential equation <code>FXY</code>. The lambda takes the limits of the region
-to evaluate as parameters, an <code>N</code> keyword argument for the number of
-steps to take, and an <code>INITIAL</code> keyword argument for the initial
-value. The lambda will use the Modified Euler (i.e. midpoint) method
-in combination with Richardson Extrapolation to evaluate the result.</p>
-
-  </div>
-</section>
-</section>
 <section id='numerical.diffeq-macros' class='section-macros'>
   <h2>Macros
   </h2>
@@ -457,6 +439,21 @@ differential equation <code>FXY</code>. The lambda takes the limits of the regio
 to evaluate as parameters, an <code>N</code> keyword argument for the number of
 steps to take, and an <code>INITIAL</code> keyword argument for the initial
 value. The lambda will use the Euler method to evaluate the result.</p>
+
+  </div>
+</section>
+<section id='apiref-extrapolated-midpoint/4' class='section-apiref-item'>
+  <div class='apiref-spec'>EXTRAPOLATED-MIDPOINT/4
+  </div>
+  <div class='apiref-lambda'>(FXY)
+  </div>
+  <div class='apiref-doc'><p>Create a lambda that can evaluate a first-order ordinary
+differential equation <code>FXY</code>. The lambda takes the limits of the region
+to evaluate as parameters, an <code>N</code> keyword argument for the number of
+steps to take, and an <code>INITIAL</code> keyword argument for the initial
+value. The lambda will use the Modified Euler (i.e. midpoint) method
+in combination with 4th order Richardson Extrapolation to evaluate the
+result.</p>
 
   </div>
 </section>
@@ -483,8 +480,8 @@ result.</p>
 differential equation <code>FXY</code>. The lambda takes the limits of the region
 to evaluate as parameters, an <code>N</code> keyword argument for the number of
 steps to take, and an <code>INITIAL</code> keyword argument for the initial
-value. The lambda will use the Modified Euler method to evaluate the
-result.</p>
+value. The lambda will use the Modified Euler method (a.k.a. midpoint
+method) to evaluate the result.</p>
 
   </div>
 </section>

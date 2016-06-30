@@ -37,8 +37,8 @@ value. The lambda will use the Euler method to evaluate the result."
 differential equation `FXY`. The lambda takes the limits of the region
 to evaluate as parameters, an `N` keyword argument for the number of
 steps to take, and an `INITIAL` keyword argument for the initial
-value. The lambda will use the Modified Euler method to evaluate the
-result."
+value. The lambda will use the Modified Euler method (a.k.a. midpoint
+method) to evaluate the result."
   (let ((gxy (gensym)))
     `(let ((,gxy (genlambda/2 ,fxy)))
        (lambda (a b &key (initial 0d0) (n 1))
@@ -92,13 +92,14 @@ evaluate the result."
               as yi = (+ y (* 1d0 step m))
               finally (return yi)))))))
 
-(defun extrapolated-midpoint/4 (fxy)
+(defmacro extrapolated-midpoint/4 (fxy)
   "Create a lambda that can evaluate a first-order ordinary
 differential equation `FXY`. The lambda takes the limits of the region
 to evaluate as parameters, an `N` keyword argument for the number of
 steps to take, and an `INITIAL` keyword argument for the initial
 value. The lambda will use the Modified Euler (i.e. midpoint) method
-in combination with Richardson Extrapolation to evaluate the result."
+in combination with 4th order Richardson Extrapolation to evaluate the
+result."
   (let ((gxy (gensym)))
     `(let ((,gxy (genlambda/2 ,fxy)))
        (labels ((extrapolate (l &optional (ni 2) nl)

@@ -22,6 +22,7 @@
 ;; macros bind _ to the numerical result and @ to the number of
 ;; iterations. They work like their "normal" namesakes if used on
 ;; other (i.e. non-library) functions.
+
 (defmacro if_ (if then &optional else)
   "make a decision based on whether or not `IF` converged and execute `THEN` or `ELSE`
 accordingly, with `_` bound to the result and `@` bound to the number of attempts."
@@ -73,7 +74,7 @@ to the result and `@` bound to the number of attempts."
                         (not (fboundp e)))
                    (list e))
                  (append (rec (car e)) (rec (cdr e))))))
-    (remove-duplicates (rec e))))
+    (remove-duplicates (rec e) :from-end t)))
   
 (defmacro genlambda/1 (e)
   "take an expression and generate a 1-argument lambda"
@@ -100,10 +101,13 @@ to the result and `@` bound to the number of attempts."
       `,e
       (let ((fv (free-vars e)))
         (cond ((eq 2 (length fv)) `(lambda ,fv ,e))
-              ((or (eq 0 (length fv))
-                   (eq 1 (length fv)))
+              ((eq 1 (length fv))
                (if (atom e)
                    `(lambda (x y) (,e x y))
-                   `(lambda (&rest r) (apply (quote ,(car e)) (append (list ,@(cdr e)) r)))))
+                   (let ((x (car fv))
+                         (y (gensym)))
+                     `(lambda (,x ,y) (declare (ignore ,y)) ,e))))
+              ((eq 0 (length fv))
+               `(lambda (&rest r) (apply (quote ,(car e)) (append (list ,@(cdr e)) r))))
               (t (error "too many free variables - should have 2 at most"))))))
 
